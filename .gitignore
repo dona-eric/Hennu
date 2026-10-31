@@ -1,8 +1,9 @@
-.venv/
+venv/
 __pycache__/
-data/
 .env
 *.log
 .agents/
 =2.8
 cache/
+*.pdf
+*.docx
