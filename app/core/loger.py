@@ -15,14 +15,13 @@ LOGGING_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 def setup_logging(name: str = 'Hɛnnu AI') -> logging.Logger:
     logger = logging.getLogger(name)
 
-    # 1. Évite d'ajouter de nouveaux handlers si le logger est déjà configuré
+    # Évite d'ajouter de nouveaux handlers si le logger est déjà configuré
     if logger.handlers:
         return logger
 
     logger.setLevel(logging.DEBUG)
     logger.propagate = False  # Empêche la remontée vers le root logger
-
-    # 2. On configure uniquement le RotatingFileHandler (Suppression de basicConfig)
+    # On configure uniquement le RotatingFileHandler (Suppression de basicConfig)
     formatter = logging.Formatter(LOGGING_FORMAT)
     
     file_handler = RotatingFileHandler(
@@ -31,7 +30,8 @@ def setup_logging(name: str = 'Hɛnnu AI') -> logging.Logger:
         backupCount=5,
         encoding="utf-8"
     )
-    file_handler.setFormatter(formatter)  # Correction de la variable 'formatter'
+    # Correction de la variable 'formatter'
+    file_handler.setFormatter(formatter)
     
     logger.addHandler(file_handler)
     

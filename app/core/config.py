@@ -1,7 +1,4 @@
-from sympy.parsing.sympy_parser import TOKEN
 import os
-import pathlib
-import requests
 import dotenv
 
 
@@ -10,16 +7,14 @@ dotenv.load_dotenv()
 
 # KEYS LLAMA CLOUD
 
-LLAMA_PARSE_API_KEY = os.getenv("LLAMA_PARSE_API_KEY")
-QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
-QDRANT_URL = "https://9825a19f-edf3-46a3-b7b7-cbe118083f9e.us-west-1-0.aws.cloud.qdrant.io"
-PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+QDRANT_API_KEY=os.getenv("QDRANT_API_KEY")
+QDRANT_URL="https://39a12a7c-bbbd-4f34-b9b8-1712e83f723a.us-west-1-0.aws.cloud.qdrant.io"
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 TOKEN_HUGGINGFACE = os.getenv("HUGGINGFACE_TOKEN")
 # REPO_ID="Qwen/Qwen3.8-2.4T-A95B"
 IMOLE_API_KEY = os.getenv("IMOLE_API_KEY")
 IMOLE_BASE_URL = "https://api.imole.app/v1"
 MODEL_IMOLE_DEFAULT="gpt-5.6-luna"
-EMBEDDING_DIMENSION =384
-EMBEDDING_MODEL_NAME="sentence-transformers/all-MiniLM-L6-v2"
-VECTOR_PROVIDER="qdrant"
+EMBEDDING_DIMENSION =1024
+EMBEDDING_MODEL_NAME="BAAI/bge-m3"
+DATALAB_API_KEY = os.getenv("marker_api_key")
