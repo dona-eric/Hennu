@@ -1,0 +1,17 @@
+llama-cloud==2.16.0
+llama-index-llms-openai==0.8.1
+pinecone==10.0.0
+python-dotenv==1.2.3
+qdrant-client==1.19.1
+sentence-transformers==6.1.0
+streamlit==1.64.0
+torch==2.14.0
+transformers==5.17.0
+uvicorn==0.53.0
+tavily-python==0.8.4
+tavily
+ragas
+marker-pdf
+pdfplumber
+python-docx
+requests
