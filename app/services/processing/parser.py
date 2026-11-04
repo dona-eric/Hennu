@@ -1,4 +1,4 @@
-from datalab_sdk import DatalabClient, ConvertOptions, AsyncDatalabClient
+from datalab_sdk import ConvertOptions, AsyncDatalabClient
 from app.services.processing.loader import get_files
 from app.core.loger import setup_logging
 from app.core.config import DATALAB_API_KEY
