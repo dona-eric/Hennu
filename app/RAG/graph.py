@@ -101,7 +101,7 @@ def customer_agent():
 
         logger.info(f"[Agent of Retrieval]")
         query = state.get(
-            ["rewritten_user_query"],
+            "rewritten_user_query",
             state['user_query'],
         )
         nodes = reranker_tool(
