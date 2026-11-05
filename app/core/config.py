@@ -19,3 +19,4 @@ EMBEDDING_DIMENSION =384
 EMBEDDING_MODEL_NAME="intfloat/multilingual-e5-small"
 DATALAB_API_KEY = os.getenv("marker_api_key")
 API_KEY_GROQ = os.getenv("GROQ_API_KEY")
+NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY")

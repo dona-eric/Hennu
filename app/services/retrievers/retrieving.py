@@ -6,7 +6,7 @@ from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core import VectorStoreIndex, StorageContext
 from llama_index.core.storage.docstore import SimpleDocumentStore
 from llama_index.core.postprocessor import SentenceTransformerRerank
-from llama_index.core.query_engine import RetrieverQueryEngine
+from llama_index.core.schema import QueryBundle
 from app.core.loger import setup_logging
 from pathlib import Path
 
@@ -71,38 +71,40 @@ def create_retriever():
 
 """
 
-def search_reranking(retriever) -> SentenceTransformerRerank:
+def search_reranking() -> SentenceTransformerRerank:
 
     """Applique un cross encoder aux candidats retournes par qdrant"""
     logger.info(f"Initialisation du modèle Reranking")
-    reranker = SentenceTransformerRerank(
+    
+    return SentenceTransformerRerank(
         top_n=5,
         model='BAAI/bge-reranker-base',
         device='cpu'
     )
     
-    return RetrieverQueryEngine.from_args(
-        retriever=retriever,
-        node_postprocessors=[reranker]
-    )
 
-
-def reranker_tool():
+def reranker_tool(retriever, reranker, query: str):
 
     "Expose le pipeline retrieval + reranking à l'agent"
 
-    
+    candidate_nodes = retriever.retrieve(query)
+
+    logger.info(
+        f"{len(candidate_nodes)} candidats récupérés depuis Qdrant."
+    )
+    if not candidate_nodes:
+        return []
     retriever_object = create_retriever()
     
-    query_engine = search_reranking(retriever=retriever_object)
+    query_engine = QueryBundle(query_str=query)
 
-    return QueryEngineTool.from_defaults(
-        query_engine=query_engine,
-        name='douane_reranker',
-        description=(
-            "Recherche dans les textes douaniers du Bénin. "
-            "Récupère des passages candidats dans Qdrant, les reclasse "
-            "avec un cross-encoder et retourne les cinq passages "
-            "les plus pertinents pour répondre à la question."
-        )
+    reranked_nodes = reranker.postprocess_nodes(
+        candidate_nodes,
+        query_bundle=query_engine,
     )
+
+    logger.info(
+        f"{len(reranked_nodes)} passages retenus après reranking."
+    )
+
+    return reranked_nodes

@@ -111,22 +111,38 @@ Mes solutions proposées pour le moment sont de deux niveaux, à savoir:
 
 `Acteur` ➔ `Activité` ➔ `Document ou Gestion` ➔ `Données(essentielle)` ➔ `Système` ➔ `Difficulté` ➔ `Risques` ➔ `Opportunité numérique`
 
-
-## 🔒 Propriété Intellectuelle & Mentions Légales
-
-> [!CAUTION]
-> ### 🛑 AVERTISSEMENT LÉGAL — REPRODUCTION INTERDITE
-> **Tous les droits sont réservés.** Ce projet, son contenu, son architecture, ses concepts, ses textes et sa méthodologie sont la propriété intellectuelle exclusive de son auteur.
->
-> ⛔ **Toute reproduction, copie, réutilisation, adaptation, distribution ou exploitation partielle ou totale de ce projet, sous quelque forme et dans quelque circonstance que ce soit, est STRICTEMENT INTERDITE sans l'autorisation écrite préalable et expresse de l'auteur.**
->
-> ⚖️ *Tout manquement ou violation constitue une contrefaçon exposant son auteur à des poursuites judiciaires et sanctions pénales conformément aux lois régissant la propriété intellectuelle et les droits d'auteur.*
+<br>
 
 <br>
 
+#### ARCHITECTURE
+
+```mermaid
+flowchart TD
+    ST[Streamlit] --> API[API DocMind]
+    API --> SQL[(SQL - documents et métadonnées)]
+    API --> FS[Stockage des fichiers]
+    API --> ING[Service d'ingestion]
+    ING --> PARSE[Parsing et chunking]
+    PARSE --> SQLN[(SQL / DocStore - nœuds)]
+    PARSE --> EMB[Embeddings]
+    EMB --> Q[(Qdrant - chunks feuilles)]
+    ST --> CHAT[Assistant RAG]
+    CHAT --> RET[Retriever + reranker]
+    RET --> Q
+    RET --> SQLN
+    RET --> LLM[LLM Groq]
+```
+
+- **Streamlit**: Interface utilisateur interactive
+- **Service d'ingestion** : Traitement, chunking hiérarchique et génération d'embeddings.
+- **Qdrant** : Base de données vectorielle pour les nœuds feuilles.
+- **DocStore / SQL** : Stockage persistant des nœuds parents et de la structure du document.
+- **LLM Groq** : Moteur d'inférence pour la génération rapide de réponses.
+
 <div align="center">
 
-| 📜 **DOCUMENT SOUS LICENCE PROPRIÉTAIRE & CONFIDENTIELLE** |
+| 📜 **PROJET SOUS LICENCE PROPRIÉTAIRE & CONFIDENTIELLE** |
 | :---: |
 | **Signé par :** `Dona Eric KOULODJI` |
 | © 2026 - Tous droits réservés • Voir la **[Licence Officielle](./LICENSE)** |

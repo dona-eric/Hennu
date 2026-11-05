@@ -2,9 +2,7 @@
 
 from pathlib import Path
 import logging
-
 import streamlit as st
-
 from app.RAG.graph import customer_agent
 
 
@@ -61,7 +59,7 @@ except Exception:
         "Vérifiez la configuration du backend et de Qdrant."
     )
     st.stop()
-
+    
 
 # ------------------------------------------------------------------
 # État de la session
@@ -141,9 +139,7 @@ def run_agent(question: str) -> tuple[str, list]:
     return answer, sources
 
 
-# ------------------------------------------------------------------
 # Navigation
-# ------------------------------------------------------------------
 
 with st.sidebar:
     st.markdown("## Hɛnnu AI")
@@ -180,9 +176,7 @@ with st.sidebar:
     st.success("Interface disponible")
 
 
-# ------------------------------------------------------------------
 # En-tête
-# ------------------------------------------------------------------
 
 st.markdown(
     """
@@ -198,9 +192,7 @@ st.markdown(
 )
 
 
-# ------------------------------------------------------------------
 # Accueil
-# ------------------------------------------------------------------
 
 if not st.session_state.chat_active:
     st.markdown(
@@ -364,9 +356,7 @@ else:
         })
 
 
-# ------------------------------------------------------------------
 # Footer
-# ------------------------------------------------------------------
 
 st.markdown(
     """

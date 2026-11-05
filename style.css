@@ -20,7 +20,162 @@ html, body, [class*="css"] {
     max-width: 1200px;
 }
 
-/* En-tête Institutionnel */
+/* En-tête Institutionnel /* ================================================================= */
+/* Hɛnnu AI — Design System & Custom Styles                         */
+/* ================================================================= */
+
+:root {
+  --primary-color: #1e3a8a;       /* Bleu institutionnel profond */
+  --primary-hover: #1e40af;
+  --accent-color: #d97706;        /* Or / ambre douanier */
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+}
+
+/* --- Style Global & Typographie --- */
+.stApp {
+  background-color: var(--bg-main);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-main);
+}
+
+/* --- En-tête Principal (Header) --- */
+.docmind-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  color: white;
+  padding: 2.5rem 2rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.2);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.docmind-header::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at top right, rgba(217, 119, 6, 0.15), transparent 50%);
+  pointer-events: none;
+}
+
+.docmind-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.docmind-header p {
+  font-size: 1.1rem;
+  color: #93c5fd;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* --- Cartes et Conteneurs (st.container with border) --- */
+div[data-testid="stVerticalBlock"] > div[data-testid="stContainer"] {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-subtle);
+  transition: all 0.3s ease;
+}
+
+div[data-testid="stVerticalBlock"] > div[data-testid="stContainer"]:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: #cbd5e1;
+}
+
+/* --- Boutons d'exemple & Actions --- */
+.stButton > button {
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid var(--border-color);
+}
+
+.stButton > button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Bouton principal (Primary) */
+button[kind="primary"] {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important;
+  border: none !important;
+  color: white !important;
+}
+
+button[kind="primary"]:hover {
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%) !important;
+}
+
+/* --- Zone de chat & Messages --- */
+[data-testid="stChatMessage"] {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-subtle);
+}
+
+/* --- Barre latérale (Sidebar) --- */
+[data-testid="stSidebar"] {
+  background-color: #ffffff;
+  border-right: 1px solid var(--border-color);
+}
+
+[data-testid="stSidebar"] .stButton > button {
+  width: 100%;
+}
+
+/* --- Pied de page (Footer) --- */
+.footer {
+  margin-top: 4rem;
+  padding: 2rem 0;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.footer-brand {
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.25rem;
+}
+
+.footer-copyright {
+  font-size: 0.85krem;
+  color: #94a3b8;
+}
+
+/* --- Expanders (Sources documentaires) --- */
+details {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: #f8fafc;
+  padding: 0.5rem 1rem;
+  margin-top: 0.75rem;
+}
+
+details summary {
+  font-weight: 600;
+  color: var(--primary-color);
+}*/
 .docmind-header {
     background: var(--green-deep);
     margin-left: calc(-50vw + 50%);
