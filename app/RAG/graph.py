@@ -1,203 +1,163 @@
 from typing import TypedDict
+
+from langgraph.graph import END, StateGraph
 from typing_extensions import NotRequired
-from langgraph.graph import StateGraph, END
-from app.services.retrievers.retrieving import create_retriever, search_reranking, reranker_tool
-from app.services.llms.endpoint import client_openai, nvidia_client
+
 from app.core.loger import setup_logging
+from app.services.configer.call_config import get_config
+from app.services.llms.endpoint import (
+    ask_llm,
+    fallback_llm,
+    fast_llm,
+    main_llm,
+)
+from app.services.llms.prompts_manager import create_default_prompt_manager
+from app.services.retrievers.reranker import IReranker
+from app.services.retrievers.retrieving import (
+    ArticleLibrary,
+    IRetriever,
+    find_articles_in_question,
+    get_parent_article,
+)
 
 logger = setup_logging()
 
+MAX_CONTENT_CHARS = 6000  # limite de taille d'un document envoyé au LLM
 
-# create l'etat de l'agent
+# Noms des templates (voir app/services/llms/prompts_manager.py)
+SYSTEM_TEMPLATE = "rag_agentic_system_prompt"
+REWRITE_TEMPLATE = "rag_query_rewrite"
+
+NO_CONTEXT_ANSWER = (
+    "Je n'ai trouvé aucun texte pertinent dans la base documentaire "
+    "pour répondre à cette question. Pouvez-vous la reformuler ou la préciser ?"
+)
+
 
 class AgentState(TypedDict):
+    """État partagé entre les étapes du graphe.
+
+    Attention : un nœud ne peut renvoyer QUE des clés déclarées ici,
+    sinon LangGraph les ignore silencieusement.
+    """
     user_query: str
     rewritten_user_query: NotRequired[str]
     context: NotRequired[str]
-    intention: NotRequired[str]
-    reponse: NotRequired[str]
     sources: NotRequired[list]
-    reponse: NotRequired[str]
+    response: NotRequired[str]
 
-def analyse_query_intention(query: str):
-    prompt = f"""
-            Tu es un expert en législation douanière béninoise.
-
-            Analyse la question de l'utilisateur.
-
-            Identifie :
-            - Le domaine juridique concerné.
-            - L'intention de l'utilisateur.
-            - La présence éventuelle d'un contentieux.
-            - La référence juridique recherchée.
-
-            Ne réponds pas à la question.
-            Retourne uniquement une classification concise.
-
-            Question :
-            {query}
-        """
-
-    response = nvidia_client.complete(prompt)
-
-    return response.text.strip()
-
-
-# personalisation de l'agent 
 
 def customer_agent():
-    """Construit et compile le graphe d'état LangGraph pour le RAG douanier."""
+    """Construit le graphe RAG douanier : reformuler -> rechercher -> répondre."""
 
-    workflow_state = StateGraph(
-        state_schema=AgentState
-        )
-    
-    retriever = create_retriever()
+    # Chargés une seule fois au démarrage
+    config = get_config()
+    retriever = IRetriever.from_config(config)
+    reranker = IReranker.from_config(config=config)
+    # Rechargée automatiquement quand la base documentaire change
+    library = ArticleLibrary()
 
-    reranker = search_reranking()
+    # Prompts versionnés : la version du prompt système vient du YAML
+    prompts = create_default_prompt_manager()
+    prompt_version = config.section("rag-agentic-config").get("prompt_version")
+    system_template = prompts.get_template(SYSTEM_TEMPLATE, prompt_version)
+    logger.info(f"Prompt système : {SYSTEM_TEMPLATE} v{system_template.version}")
 
-    # Step 1: Analyse et Optimisation de la requete utilisateur
-
+    # Étape 1 : reformuler la question avec le vocabulaire douanier
     def analyse_query(state: AgentState):
-
-        logger.info(f"1- Analyse de la requete uitilisateur")
+        logger.info("[1/3] Reformulation de la question")
         question = state["user_query"]
-        intention = analyse_query_intention(question)
 
-        prompt = f"""
-            Tu es un assistant expert en législation douanière (Code des Douanes du Bénin).
-            
-            Intention Utilisateur:
-            {intention}
-            Reformule la question suivante pour qu'elle intègre le vocabulaire juridique
-            Reformule la question suivante pour optimiser la recherche
-            dans une base documentaire juridique.
+        prompt = prompts.render_template(REWRITE_TEMPLATE, question=question)
+        rewritten_question = ask_llm(fast_llm, prompt) or question
+        logger.info(f"Question reformulée : {rewritten_question}")
+        return {"rewritten_user_query": rewritten_question}
 
-            Règles :
-            - Conserve le sens exact de la question.
-            - Utilise le vocabulaire juridique et douanier approprié.
-            - N'ajoute aucune information qui n'est pas présente.
-            - Retourne uniquement la question reformulée.
-
-            Question originale :
-            {question}
-            """
-
-        response = nvidia_client.complete(
-            prompt=prompt
-        )
-        rewritten_question = response.text.strip()
-        
-        logger.info(f"Requête user réécrite : {rewritten_question}")
-        return {
-            "rewritten_user_query": rewritten_question,
-            "intention": intention
-            }
-
-
-    # step 2: etape de recuperation des reponses de qdrant
-
+    # Étape 2 : chercher les textes pertinents
     def retrieve_and_rerank_nodes(state: AgentState):
+        logger.info("[2/3] Recherche des textes pertinents")
+        question = state["user_query"]
+        query = state.get("rewritten_user_query", question)
 
-        logger.info(f"[Agent of Retrieval]")
-        query = state.get(
-            "rewritten_user_query",
-            state['user_query'],
-        )
-        nodes = reranker_tool(
-            retriever=retriever,
-            reranker=reranker,
-            query=query,
-        )
-
-        if not nodes:
-            logger.warning("Aucun document pertinent trouvé.")
-
-        return {
-            "context": "",
-            "sources": [],
-        }
-
-        # Construction du contexte juridique
         context_parts = []
         sources = []
+        seen_ids = set()
 
-        for rank, node in enumerate(nodes, start=1):
+        def add_document(text_node, score=None):
+            """Ajoute un document au contexte (une seule fois par article)."""
+            if text_node.node_id in seen_ids:
+                return
+            seen_ids.add(text_node.node_id)
 
-            content = node.get_content()
-            metadata = node.metadata or {}
+            metadata = text_node.metadata or {}
+            article = metadata.get("article_title") or "Passage"
+            document = metadata.get("document_title") or metadata.get("source", "Source inconnue")
+            chapter = metadata.get("chapter") or ""
+            content = text_node.get_content()[:MAX_CONTENT_CHARS]
 
-            article = metadata.get("article", "Non précisé")
-            source = metadata.get(
-                "file_name",
-                metadata.get("source", "Source inconnue"),
-            )
-
-            score = node.score
-
+            # Le numéro [n] est celui que le LLM cite et que l'interface affiche
             context_parts.append(
-                f"""
-                [Document {rank}]
-                Article : {article}
-                Source : {source}
-                Score : {score}
-
-                Contenu :
-                {content}
-                """
+                f"[{len(sources) + 1}]\n"
+                f"Texte : {document}\n"
+                f"Chapitre : {chapter}\n"
+                f"{article}\n\n"
+                f"{content}"
             )
-
             sources.append({
-                "rank": rank,
+                "title": f"{article} — {document}",
                 "article": article,
-                "source": source,
+                "source": metadata.get("source"),
+                "document_id": metadata.get("document_id"),
                 "score": score,
                 "content": content,
             })
 
-        return {
-            "context": "\n\n".join(context_parts),
-            "sources": sources,
-        }
+        library.refresh()
 
+        # a) La question cite un article précis : on va le chercher directement
+        direct_articles = find_articles_in_question(question, library.article_index)
+        for article_node in direct_articles:
+            add_document(article_node)
+        if direct_articles:
+            logger.info(f"{len(direct_articles)} article(s) trouvé(s) par leur numéro.")
 
+        # Recherche par le sens (Qdrant + reranker), en complément
+        for node in reranker.rerank(query, retriever.retrieve(query)):
+            # On remplace le passage par l'article complet quand c'est possible
+            add_document(get_parent_article(node, library.docstore), score=node.score)
+
+        if not sources:
+            logger.warning("Aucun document pertinent trouvé.")
+
+        logger.info(f"{len(sources)} documents envoyés au LLM.")
+        return {"context": "\n\n---\n\n".join(context_parts), "sources": sources}
+
+    # Étape 3 : rédiger la réponse à partir du contexte
     def generate_final_response(state: AgentState):
-        logger.info("Agent [Generate] : Rédaction de la réponse juridique...")
-        question = state['user_query']
-        context = state["context"]
-        
-        prompt = f"""
-        Tu es un assistant juridique de pointe spécialisé dans le Code des Douanes de la République du Bénin. 
-        Tu t'adresses à des commissaires agréés et des professionnels de la douane exigeants.
-        
-        Règles de réponse :
-        1. Base-toi exclusivement sur le contexte juridique fourni ci-dessous.
-        2. Cite clairement les articles, chapitres ou sections applicables.
-        3. Sois précis, rigoureux et professionnel dans l'explication des procédures, régimes ou contentieux douaniers.
-        
-        Contexte juridique extrait :
-        {context}
-        
-        Question de l'utilisateur :
-        {question}
-        """
-        
-        response = client_openai.complete(
-            prompt=prompt
+        logger.info("[3/3] Rédaction de la réponse")
+        context = state.get("context", "")
+
+        if not context:
+            return {"response": NO_CONTEXT_ANSWER}
+
+        # Le contexte est dans le prompt système
+        answer = ask_llm(
+            main_llm,
+            state["user_query"],
+            system_prompt=system_template.render(context=context),
+            fallback_llm=fallback_llm,
         )
+        return {"response": answer}
 
-        return {"response": response.text.strip()}
+    # Construction du graphe
+    workflow = StateGraph(state_schema=AgentState)
+    workflow.add_node("analyze_query", analyse_query)
+    workflow.add_node("retrieve_docs", retrieve_and_rerank_nodes)
+    workflow.add_node("generate_response", generate_final_response)
 
-    # Ajout des nœuds au graphe LangGraph
-    workflow_state.add_node("analyze_query", analyse_query)
-    workflow_state.add_node("retrieve_docs", retrieve_and_rerank_nodes)
-    workflow_state.add_node("generate_response", generate_final_response)
+    workflow.set_entry_point("analyze_query")
+    workflow.add_edge("analyze_query", "retrieve_docs")
+    workflow.add_edge("retrieve_docs", "generate_response")
+    workflow.add_edge("generate_response", END)
 
-    # Définition des liaisons (flux d'exécution)
-    workflow_state.set_entry_point("analyze_query")
-    workflow_state.add_edge("analyze_query", "retrieve_docs")
-    workflow_state.add_edge("retrieve_docs", "generate_response")
-    workflow_state.add_edge("generate_response", END)
-
-    # Compilation du graphe
-    return workflow_state.compile()
+    return workflow.compile()
