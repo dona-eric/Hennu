@@ -16,6 +16,7 @@ from settings import (
     APP_TAGLINE,
     ASSISTANT_AVATAR,
     CHAT_PLACEHOLDER,
+    DOCUMENTS_PAGE,
     EMPTY_ANSWER,
     ERROR_ANSWER,
     EXAMPLE_QUESTIONS,
@@ -247,6 +248,16 @@ def _render_sources_expander(message: Message) -> None:
             title = source.get("title") or source.get("article") or ""
             content = source.get("content") or source.get("text") or ""
             st.html(templates.excerpt(index, title, content))
+
+            # Ouvre le document dans la liseuse (navigation interne :
+            # la conversation en cours est conservée)
+            if source.get("document_id"):
+                st.page_link(
+                    DOCUMENTS_PAGE,
+                    label="Lire le document",
+                    icon=":material/menu_book:",
+                    query_params={"doc": source["document_id"], "page": "1"},
+                )
 
 
 def _meta_parts(message: Message) -> list[str]:
