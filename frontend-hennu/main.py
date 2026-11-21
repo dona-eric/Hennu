@@ -11,7 +11,13 @@ dans `static/css/`.
 import streamlit as st
 
 from services import conversation as session
-from settings import ASSISTANT_PAGE, HOME_PAGE, PAGE_ICON, PAGE_TITLE
+from settings import (
+    ASSISTANT_PAGE,
+    DOCUMENTS_PAGE,
+    HOME_PAGE,
+    PAGE_ICON,
+    PAGE_TITLE,
+)
 from ui.styles import load_styles
 
 
@@ -25,7 +31,8 @@ def main() -> None:
     load_styles()
     session.init_session()
 
-    # Deux routes : l'accueil (/) et l'assistant (/assistant).
+    # Trois routes : l'accueil (/), l'assistant (/assistant)
+    # et la base documentaire (/documents).
     # La navigation est cachée : on circule via la barre de navigation
     # de l'accueil et la barre latérale de l'assistant.
     pages = [
@@ -35,6 +42,12 @@ def main() -> None:
             title="Assistant douanier",
             icon=":material/balance:",
             url_path="assistant",
+        ),
+        st.Page(
+            DOCUMENTS_PAGE,
+            title="Base documentaire",
+            icon=":material/library_books:",
+            url_path="documents",
         ),
     ]
     st.navigation(pages, position="hidden").run()
