@@ -1,0 +1,363 @@
+/* =================================================================
+   Hɛnnu — Base documentaire : bibliothèque, liseuse, administration
+   ================================================================= */
+
+/* ---------- En-tête ---------- */
+
+.hn-docs-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 2.2rem 2rem;
+    margin-bottom: 1.2rem;
+    border-radius: var(--hn-radius-lg);
+    background:
+        radial-gradient(500px 240px at 100% 0%, rgba(201, 162, 39, 0.22), transparent 70%),
+        linear-gradient(140deg, var(--hn-green-800), var(--hn-green-900));
+    box-shadow: var(--hn-shadow-lg);
+    animation: hn-rise var(--hn-slow) var(--hn-ease-out) both;
+}
+
+.stApp .hn-docs-header h1 {
+    margin: 0 0 0.4rem;
+    padding: 0;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    color: #FFFFFF;
+}
+
+.hn-docs-header p {
+    max-width: 520px;
+    margin: 0;
+    color: rgba(247, 245, 239, 0.8);
+}
+
+.hn-docs-stats {
+    display: flex;
+    gap: 0.8rem;
+}
+
+.hn-docs-stat {
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--hn-radius-md);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.hn-docs-stat__value {
+    font-family: var(--hn-font-title);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--hn-gold-300);
+    font-variant-numeric: tabular-nums;
+}
+
+.hn-docs-stat__label {
+    font-size: 0.75rem;
+    color: rgba(247, 245, 239, 0.7);
+}
+
+/* ---------- Onglets ---------- */
+
+.stApp [data-baseweb="tab-list"] {
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--hn-line);
+}
+
+.stApp [data-baseweb="tab"] p {
+    font-weight: 500;
+    color: var(--hn-ink-muted);
+}
+
+.stApp [data-baseweb="tab"][aria-selected="true"] p {
+    color: var(--hn-green-800);
+}
+
+.stApp [data-baseweb="tab-highlight"] {
+    background-color: var(--hn-gold-500);
+}
+
+/* ---------- Cartes de documents ---------- */
+
+[class*="st-key-doc_card_"] {
+    height: 100%;
+    padding: 0.9rem;
+    border: 1px solid var(--hn-line);
+    border-radius: var(--hn-radius-md);
+    background: var(--hn-surface);
+    box-shadow: var(--hn-shadow-xs);
+    animation: hn-rise var(--hn-base) var(--hn-ease-out) both;
+    transition:
+        transform var(--hn-base) var(--hn-ease-out),
+        box-shadow var(--hn-base) var(--hn-ease-out),
+        border-color var(--hn-base) ease;
+}
+
+[class*="st-key-doc_card_"]:hover {
+    transform: translateY(-3px);
+    border-color: var(--hn-line-strong);
+    box-shadow: var(--hn-shadow-md);
+}
+
+.hn-doc-card__cover {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 110px;
+    margin-bottom: 0.9rem;
+    border-radius: var(--hn-radius-sm);
+    background:
+        repeating-linear-gradient(45deg, rgba(11, 79, 60, 0.04) 0 1px, transparent 1px 14px),
+        var(--hn-green-50);
+    color: var(--hn-green-800);
+}
+
+.hn-doc-card__cover .hn-icon {
+    font-size: 2.6rem;
+    transition: transform var(--hn-base) var(--hn-ease-spring);
+}
+
+[class*="st-key-doc_card_"]:hover .hn-doc-card__cover .hn-icon {
+    transform: translateY(-3px) rotate(-4deg);
+}
+
+.hn-doc-card__type {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    background: var(--hn-green-800);
+    color: var(--hn-gold-300);
+    font-family: var(--hn-font-mono);
+    font-size: 0.65rem;
+}
+
+.stApp .hn-doc-card__title {
+    display: -webkit-box;
+    margin: 0 0 0.35rem;
+    padding: 0;
+    overflow: hidden;
+    font-size: 1rem;
+    line-height: 1.35;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.hn-doc-card__text {
+    display: -webkit-box;
+    margin: 0 0 0.4rem;
+    overflow: hidden;
+    font-size: 0.85rem;
+    color: var(--hn-ink-muted);
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.hn-doc-card__meta {
+    font-size: 0.75rem;
+    color: var(--hn-ink-soft);
+}
+
+.hn-empty-note {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 2rem;
+    justify-content: center;
+    color: var(--hn-ink-muted);
+}
+
+/* ---------- Liseuse ---------- */
+
+.hn-reader-header {
+    margin: 0.5rem 0 1rem;
+    text-align: center;
+    animation: hn-rise var(--hn-base) var(--hn-ease-out) both;
+}
+
+.stApp .hn-reader-header h1 {
+    margin: 0 0 0.3rem;
+    padding: 0;
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+}
+
+.hn-reader-header p {
+    max-width: 640px;
+    margin: 0 auto 0.3rem;
+    color: var(--hn-ink-muted);
+}
+
+.hn-reader-header__meta {
+    font-size: 0.8rem;
+    color: var(--hn-ink-soft);
+}
+
+.st-key-reader_toolbar {
+    position: sticky;
+    top: 0.75rem;
+    z-index: 40;
+    width: fit-content;
+    margin: 0 auto 1rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--hn-line);
+    border-radius: var(--hn-radius-pill);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--hn-shadow-sm);
+}
+
+.hn-reader__total {
+    font-size: 0.9rem;
+    color: var(--hn-ink-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.st-key-reader_page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0.6rem;
+    border-radius: var(--hn-radius-sm);
+    background: #E9E5D9;
+    box-shadow: inset 0 0 0 1px var(--hn-line);
+}
+
+/* Page affichée comme une feuille : pas de sélection, pas de glisser,
+   pas de menu contextuel sur l'image, pas de bouton plein écran */
+.st-key-reader_page img {
+    border-radius: 2px;
+    box-shadow: 0 6px 24px -8px rgba(31, 42, 36, 0.35);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    animation: hn-fade var(--hn-base) ease both;
+}
+
+.st-key-reader_page [data-testid="stElementToolbar"] {
+    display: none;
+}
+
+/* ---------- Formulaires ---------- */
+
+.hn-form-intro {
+    max-width: 640px;
+    margin: 0.5rem 0 1rem;
+}
+
+.stApp .hn-form-intro h3 {
+    margin: 0 0 0.3rem;
+    padding: 0;
+    font-size: 1.25rem;
+}
+
+.hn-form-intro p {
+    margin: 0;
+    color: var(--hn-ink-muted);
+}
+
+[data-testid="stFileUploaderDropzone"] {
+    border: 1.5px dashed var(--hn-line-strong);
+    border-radius: var(--hn-radius-md);
+    background: var(--hn-surface);
+    transition: border-color var(--hn-fast) ease, background-color var(--hn-fast) ease;
+}
+
+[data-testid="stFileUploaderDropzone"]:hover {
+    border-color: var(--hn-green-600);
+    background: var(--hn-green-50);
+}
+
+/* ---------- Administration ---------- */
+
+[class*="st-key-admin_"]:has(.hn-admin-item) {
+    margin-bottom: 0.6rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--hn-line);
+    border-radius: var(--hn-radius-md);
+    background: var(--hn-surface);
+    animation: hn-rise var(--hn-base) var(--hn-ease-out) both;
+}
+
+.hn-admin-item__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.hn-admin-item__title {
+    font-weight: 600;
+    color: var(--hn-green-900);
+}
+
+.hn-admin-item__text {
+    margin: 0.3rem 0 0;
+    font-size: 0.85rem;
+    color: var(--hn-ink-muted);
+}
+
+.hn-admin-item__meta {
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
+    color: var(--hn-ink-soft);
+}
+
+.hn-admin-item__message {
+    margin: 0.4rem 0 0;
+    font-size: 0.8rem;
+    color: var(--hn-rust-500);
+}
+
+.hn-status-badge {
+    padding: 0.12rem 0.6rem;
+    border-radius: var(--hn-radius-pill);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    background: var(--hn-line);
+    color: var(--hn-ink-muted);
+}
+
+.hn-status-badge.is-pending {
+    background: var(--hn-gold-100);
+    color: #7A5E0E;
+}
+
+.hn-status-badge.is-approved,
+.hn-status-badge.is-processing {
+    background: var(--hn-green-100);
+    color: var(--hn-green-800);
+    animation: hn-pulse 1.8s ease-out infinite;
+}
+
+.hn-status-badge.is-ready {
+    background: var(--hn-green-800);
+    color: #FFFFFF;
+}
+
+.hn-status-badge.is-failed {
+    background: #F7E1D4;
+    color: var(--hn-rust-500);
+}
+
+@media (max-width: 640px) {
+    .hn-docs-header {
+        padding: 1.6rem 1.2rem;
+    }
+
+    .hn-docs-stats {
+        width: 100%;
+    }
+
+    .hn-docs-stat {
+        flex: 1;
+        min-width: 0;
+    }
+}
