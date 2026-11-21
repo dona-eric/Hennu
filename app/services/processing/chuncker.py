@@ -1,18 +1,47 @@
 from dataclasses import dataclass, field
 import re
 from uuid import uuid4
-from app.core.loger import setup_logging
+
 from llama_index.core.node_parser import TokenTextSplitter
 from llama_index.core.schema import NodeRelationship, RelatedNodeInfo, TextNode
 
+from app.core.loger import setup_logging
+
 """
-Ici je teste dans un premier temps la technique de segmentation Hierachique
-car les données sont des rapports, des articles avec des sections, des codes et lois.
+Segmentation hiérarchique des textes juridiques :
+Chapitre -> Section -> Sous-section -> Article -> Chunks.
+
+Un même fichier peut contenir plusieurs textes (le code, puis des décrets
+ou arrêtés en annexe), chacun avec sa propre numérotation d'articles.
+Chaque nouvel "Article 1er" ouvre donc un nouveau texte (text_index + 1).
+Le texte n°0 est le texte principal du fichier (le code lui-même).
 """
 logger = setup_logging()
 
 CHUNK_SIZE = 384
 CHUNK_OVERLAP = 50
+
+# Métadonnées techniques : utiles au code, inutiles pour l'embedding et le LLM
+TECHNICAL_METADATA = ["node_type", "chunk_index", "text_index", "is_main_text", "priority", "document_id"]
+
+# En-têtes et numéros de page laissés par la conversion PDF -> Markdown
+PAGE_HEADER = re.compile(                            # peut être collé au texte
+    r"\d*\s*LOI N° 2014-20 DU 12 SEPTEMBRE 2014 PORTANT\s*"
+    r"|CODE DES DOUANES EN RÉPUBLIQUE DU BÉNIN\.?"
+)
+PAGE_HEADER_LINE = "code des douanes de la république du bénin"  # ligne entière
+PAGE_NUMBER = re.compile(r"^\d{1,4}$")              # ex : "157"
+PAGINATION = re.compile(r"^\{\d+\}[-\s]*$")          # ex : "{291}-------"
+
+# Titres reconnus (testés sur la ligne nettoyée)
+ARTICLE = re.compile(
+    r"^Article\s+(premier|\d+)\s*(?:er)?\s*(bis|ter|quater)?\b(?:\s*nouveau)?\s*[:.\-–]?\s*(.*)$",
+    re.IGNORECASE,
+)
+CHAPTER = re.compile(r"^Chapitre\s+([IVXLCDM]+|premier|\d+\s*(?:er)?)\b\s*[:.\-–]?\s*(.*)$", re.IGNORECASE)
+SECTION = re.compile(r"^Section\s+([IVXLCDM]+|premiere|première|\d+\s*(?:ère|re)?)\b\s*[:.\-–]?\s*(.*)$", re.IGNORECASE)
+SUBSECTION = re.compile(r"^(?:Paragraphe\s+)?(\d+|1er)\s*[-.)]\s*(.+)$", re.IGNORECASE)
+
 
 @dataclass
 class LegalBlock:
@@ -23,42 +52,58 @@ class LegalBlock:
 
 
 def clean_markdown_line(line: str) -> str:
-    """Nettoie les caractères Markdown autour des titres."""
+    """Retire la syntaxe Markdown/HTML : #, **, <sup>...</sup>, échappements."""
+    line = re.sub(r"<[^>]+>", "", line)
     line = re.sub(r"^\s*#{1,6}\s*", "", line)
     line = re.sub(r"\*{1,2}", "", line)
     line = re.sub(r"\\([.*])", r"\1", line)
     return line.strip()
 
 
-def detect_structure(line: str):
-    """Détecte la structure juridique indépendamment du nombre de # dans le Markdown."""
-    line = clean_markdown_line(line)
+def is_title_line(raw_line: str) -> bool:
+    """Un vrai titre est un titre Markdown (#) ou une ligne qui commence en gras (**)."""
+    return raw_line.lstrip().startswith(("#", "**"))
 
-    patterns = [
-        ("CHAPTER", r"^Chapitre\s+([IVXLCDM]+)\b\s*(.*)$"),
-        ("SECTION", r"^Section\s+([IVXLCDM]+)\s*[:.\-]?\s*(.*)$"),
-        ("SUBSECTION", r"^\d+\.\s+(.+)$"),
-        ("ARTICLE", r"^Article\s+(\d+[A-Za-z]?)\b\s*(.*)$"),
-    ]
 
-    for block_type, pattern in patterns:
-        match = re.match(pattern, line, flags=re.IGNORECASE)
+def detect_structure(raw_line: str):
+    """Renvoie (type, groupes) si la ligne est un titre juridique, sinon (None, None).
+
+    Les lignes de texte normales (ex : "1. Sur l'ensemble du territoire...")
+    ne sont jamais prises pour des titres.
+    """
+    if not is_title_line(raw_line):
+        return None, None
+
+    line = clean_markdown_line(raw_line)
+
+    for block_type, pattern in (
+        ("CHAPTER", CHAPTER),
+        ("SECTION", SECTION),
+        ("ARTICLE", ARTICLE),
+    ):
+        match = pattern.match(line)
         if match:
             return block_type, match.groups()
+
+    # Sous-section ("1er - Concession de l'entrepôt") : seulement en titre Markdown
+    if raw_line.lstrip().startswith("#"):
+        match = SUBSECTION.match(line)
+        if match:
+            return "SUBSECTION", match.groups()
 
     return None, None
 
 
+def article_number(number: str, suffix: str | None) -> str:
+    """'premier' -> '1', ('12', 'bis') -> '12 bis'."""
+    number = "1" if number.lower() == "premier" else number.strip()
+    return f"{number} {suffix.lower()}" if suffix else number
+
+
 def parse_legal_document(markdown: str) -> list[LegalBlock]:
-    lines = markdown.splitlines()
     blocks = []
-
-    context = {
-        "chapter": None,
-        "section": None,
-        "subsection": None,
-    }
-
+    context = {"chapter": None, "section": None, "subsection": None}
+    text_index = -1          # passe à 0 au premier "Article 1er"
     current_article = None
     article_lines = []
 
@@ -77,6 +122,9 @@ def parse_legal_document(markdown: str) -> list[LegalBlock]:
                     metadata={
                         **context,
                         "article_number": current_article["number"],
+                        "article_title": current_article["title"],
+                        "text_index": max(text_index, 0),
+                        "is_main_text": text_index <= 0,
                     },
                 )
             )
@@ -84,20 +132,20 @@ def parse_legal_document(markdown: str) -> list[LegalBlock]:
         current_article = None
         article_lines = []
 
-    for raw_line in lines:
-        line = raw_line.strip()
-        if not line:
+    for raw_line in markdown.splitlines():
+        # 1. Nettoyage des artefacts de pagination
+        line = PAGE_HEADER.sub("", raw_line).strip()
+        if (
+            not line
+            or PAGINATION.fullmatch(line)
+            or PAGE_NUMBER.fullmatch(line)
+            or line.lower() == PAGE_HEADER_LINE
+        ):
             continue
 
-        # Nettoyage des artefacts de pagination
-        if re.fullmatch(r"\{\d+\}[-\s]*", line):
-            continue
+        block_type, groups = detect_structure(raw_line)
 
-        if line.lower().startswith("code des douanes de la république du bénin"):
-            continue
-
-        block_type, groups = detect_structure(line)
-
+        # 2. Mise à jour de la hiérarchie
         if block_type == "CHAPTER":
             flush_article()
             number, title = groups
@@ -115,21 +163,80 @@ def parse_legal_document(markdown: str) -> list[LegalBlock]:
 
         elif block_type == "SUBSECTION":
             flush_article()
-            title = groups[0]
-            context["subsection"] = title
+            context["subsection"] = groups[1].lstrip("-–. ")
 
         elif block_type == "ARTICLE":
             flush_article()
-            number, title = groups
-            current_article = {
-                "number": number,
-                "title": f"Article {number}",
-            }
+            number_raw, suffix, first_text = groups
+            number = article_number(number_raw, suffix)
 
+            # Un nouvel "Article 1er" = début d'un nouveau texte
+            if number == "1":
+                text_index += 1
+                if text_index > 0:
+                    context = {"chapter": None, "section": None, "subsection": None}
+
+            current_article = {"number": number, "title": f"Article {number}"}
+
+            # Le texte écrit sur la même ligne que le titre fait partie de l'article
+            if first_text:
+                article_lines.append(first_text)
+
+        # 3. Ligne de contenu
         elif current_article is not None:
-            article_lines.append(raw_line)
+            article_lines.append(line)
 
     flush_article()
+    return blocks
+
+
+def parse_generic_document(markdown: str) -> list[LegalBlock]:
+    """Pour les documents sans articles (manuels, notes circulaires) :
+    un bloc par titre Markdown, avec le chemin des titres comme repère.
+    """
+    blocks = []
+    headings = {}            # niveau du titre -> texte du titre
+    title = "Début du document"
+    lines = []
+
+    def flush():
+        text = "\n".join(lines).strip()
+        if text:
+            blocks.append(
+                LegalBlock(
+                    block_type="PASSAGE",
+                    title=title,
+                    text=text,
+                    metadata={
+                        "chapter": None,
+                        "section": None,
+                        "subsection": None,
+                        "article_number": None,
+                        "article_title": title,
+                        "text_index": 0,
+                        "is_main_text": False,
+                    },
+                )
+            )
+
+    for raw_line in markdown.splitlines():
+        line = raw_line.strip()
+        if not line or PAGINATION.fullmatch(line) or PAGE_NUMBER.fullmatch(line):
+            continue
+
+        heading = re.match(r"^(#{1,6})\s", line)
+        if heading:
+            flush()
+            lines = []
+            level = len(heading.group(1))
+            headings[level] = clean_markdown_line(line)
+            # On oublie les sous-titres de l'ancien titre
+            headings = {lvl: txt for lvl, txt in headings.items() if lvl <= level}
+            title = " > ".join(headings[lvl] for lvl in sorted(headings))
+        else:
+            lines.append(line)
+
+    flush()
     return blocks
 
 
@@ -138,6 +245,8 @@ def create_node(text: str, node_type: str, metadata: dict) -> TextNode:
         id_=str(uuid4()),
         text=text,
         metadata={**metadata, "node_type": node_type},
+        excluded_embed_metadata_keys=TECHNICAL_METADATA,
+        excluded_llm_metadata_keys=TECHNICAL_METADATA,
     )
 
 
@@ -165,6 +274,7 @@ def build_legal_hierarchy(blocks: list[LegalBlock]):
 
     for block in blocks:
         metadata = block.metadata
+        text_index = metadata["text_index"]
         chapter = metadata.get("chapter")
         section = metadata.get("section")
         subsection = metadata.get("subsection")
@@ -173,7 +283,7 @@ def build_legal_hierarchy(blocks: list[LegalBlock]):
 
         # Chapitre
         if chapter:
-            chapter_key = ("chapter", chapter)
+            chapter_key = ("chapter", text_index, chapter)
             if chapter_key not in structural_nodes:
                 chapter_node = create_node(
                     text=chapter,
@@ -186,7 +296,7 @@ def build_legal_hierarchy(blocks: list[LegalBlock]):
 
         # Section
         if section:
-            section_key = ("section", chapter, section)
+            section_key = ("section", text_index, chapter, section)
             if section_key not in structural_nodes:
                 section_node = create_node(
                     text=section,
@@ -201,7 +311,7 @@ def build_legal_hierarchy(blocks: list[LegalBlock]):
 
         # Sous-section
         if subsection:
-            subsection_key = ("subsection", chapter, section, subsection)
+            subsection_key = ("subsection", text_index, chapter, section, subsection)
             if subsection_key not in structural_nodes:
                 subsection_node = create_node(
                     text=subsection,
@@ -218,10 +328,10 @@ def build_legal_hierarchy(blocks: list[LegalBlock]):
                 all_nodes.append(subsection_node)
             parent = structural_nodes[subsection_key]
 
-        # Article
+        # Article (ou passage d'un manuel)
         article_node = create_node(
             text=block.title + "\n\n" + block.text,
-            node_type="ARTICLE",
+            node_type=block.block_type,
             metadata=metadata,
         )
 
@@ -230,11 +340,11 @@ def build_legal_hierarchy(blocks: list[LegalBlock]):
 
         all_nodes.append(article_node)
 
-        # Segmentation de l'article en chunks
+        # Segmentation de l'article en chunks (le titre est gardé dans le texte)
         chunks = splitter.split_text(block.text)
         for chunk_index, chunk_text in enumerate(chunks):
             chunk_node = create_node(
-                text=chunk_text,
+                text=f"{block.title} : {chunk_text}",
                 node_type="CHUNK",
                 metadata={
                     **metadata,
@@ -251,6 +361,7 @@ def build_legal_hierarchy(blocks: list[LegalBlock]):
 
 def chunk_documents(markdown: str):
     """Pipeline complet : Markdown -> blocs juridiques -> hiérarchie."""
-    blocks = parse_legal_document(markdown)
+    # Textes juridiques découpés par article, sinon découpage par titres
+    blocks = parse_legal_document(markdown) or parse_generic_document(markdown)
     all_nodes, leaf_nodes = build_legal_hierarchy(blocks)
     return all_nodes, leaf_nodes
