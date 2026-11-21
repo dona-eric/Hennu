@@ -1,0 +1,55 @@
+# Configuration RAG Sécurisée
+# Protection maximale contre les hallucinations
+
+# Mode de fonctionnement
+enable_citations: true
+require_sources: true
+prevent_hallucinations: true
+confidence_threshold: 0.7  # Seuil élevé
+
+# Prompts
+system_prompt_template: "rag_safe_system"
+user_prompt_template: "rag_citations_user"
+
+# Génération
+default_temperature: 0.3  # Très déterministe
+default_max_tokens: 400
+
+# Retrieval
+default_top_k: 5
+min_relevance_score: 0.7  # Seuil élevé
+
+# Formatage
+citation_style: "numeric"
+include_source_metadata: true
+
+# Sécurité renforcée
+security:
+  strict_context_adherence: true
+  reject_uncertain_answers: true
+  require_minimum_citations: 2
+  verify_source_relevance: true
+
+# Description
+description: |
+  Configuration RAG avec sécurité maximale.
+  - Protection contre les hallucinations
+  - Seuils élevés partout (0.7)
+  - Température très basse (0.3)
+  - Citations obligatoires (min 2)
+  - Préfère dire "je ne sais pas" que de se tromper
+  - Idéal pour: Applications critiques, médical, légal
+
+# Cas d'usage
+use_cases:
+  - "Conseil juridique"
+  - "Informations financières"
+  - "Situations critiques"
+
+# Règles de sécurité
+safety_rules:
+  - "Ne jamais inventer d'information"
+  - "Rejeter les questions hors contexte"
+  - "Indiquer explicitement les incertitudes"
+  - "Citer systématiquement les sources"
+  - "Vérifier la cohérence des sources"
