@@ -12,6 +12,7 @@ from settings import (
     APP_TAGLINE,
     ASSISTANT_PAGE,
     COPYRIGHT_YEAR,
+    DOCUMENTS_PAGE,
     FEATURES,
     HERO_TEXT,
     HOW_IT_WORKS,
@@ -94,8 +95,14 @@ def _render_modules() -> None:
             templates.module_card(
                 "library_books",
                 "Base documentaire",
-                "Tous les textes douaniers réunis, consultables "
-                "et recherchables en un seul endroit.",
-                badge="Bientôt",
+                "Tous les textes douaniers réunis, consultables en ligne. "
+                "Proposez vos propres documents.",
+                badge="Disponible",
             )
+        )
+        st.page_link(
+            DOCUMENTS_PAGE,
+            label="Explorer la base",
+            icon=":material/arrow_forward:",
+            icon_position="right",
         )

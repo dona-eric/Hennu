@@ -64,10 +64,6 @@
     background: var(--hn-green-50);
 }
 
-.st-key-nav_documents button {
-    opacity: 0.55;
-}
-
 /* Bouton d'action principal de la barre */
 .st-key-nav_cta [data-testid="stPageLink-NavLink"] {
     background: var(--hn-green-800);
@@ -397,11 +393,36 @@
     color: var(--hn-ink-muted);
 }
 
-/* Modules à venir : en retrait */
-.st-key-module_audit .hn-card,
-.st-key-module_documents .hn-card {
+/* Module à venir : en retrait */
+.st-key-module_audit .hn-card {
     background: linear-gradient(180deg, var(--hn-surface), var(--hn-green-50));
     opacity: 0.85;
+}
+
+/* Carte « Base documentaire » : lien en bas de carte */
+.st-key-module_documents .hn-card {
+    padding-bottom: 3.6rem;
+}
+
+.st-key-module_documents .hn-card__badge {
+    background: var(--hn-green-100);
+    color: var(--hn-green-800);
+}
+
+.st-key-module_documents [data-testid="stElementContainer"]:has([data-testid="stPageLink"]) {
+    margin-top: -3.6rem;
+    padding-left: 1.5rem;
+}
+
+.st-key-module_documents [data-testid="stPageLink-NavLink"] {
+    padding: 0;
+    background: transparent;
+}
+
+.st-key-module_documents [data-testid="stPageLink-NavLink"] p,
+.st-key-module_documents [data-testid="stPageLink-NavLink"] span {
+    color: var(--hn-green-800);
+    font-weight: 600;
 }
 
 /* Carte « Assistant douanier » : entièrement cliquable */
