@@ -3,7 +3,12 @@ Tout ce qui est « réglable » (textes, icônes, délais, fichiers CSS)
 se trouve ici pour ne pas avoir à fouiller dans le code.
 """
 
+import os
 from pathlib import Path
+
+# API Hɛnnu (l'agent RAG tourne dans l'API FastAPI)
+API_URL = os.getenv("HENNU_API_URL", "http://localhost:8000").rstrip("/")
+API_TIMEOUT_SECONDS = 300  # durée maximale d'une réponse
 
 FRONTEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = FRONTEND_DIR.parent
@@ -123,7 +128,7 @@ ERROR_ANSWER = (
     "Une erreur est survenue pendant le traitement de votre question. "
     "Vous pouvez relancer la question."
 )
-AGENT_INIT_ERROR = (
-    "L'assistant n'a pas pu être initialisé. "
-    "Vérifiez la configuration du backend et de Qdrant."
+AGENT_UNAVAILABLE_HINT = (
+    "Lancez l'API depuis la racine du projet : "
+    "`uvicorn app.api.routes:app --port 8000`"
 )

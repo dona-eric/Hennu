@@ -7,12 +7,12 @@ from collections.abc import Iterator
 import streamlit as st
 
 from services import conversation as session
-from services.agent import get_agent, stream_agent
+from services.agent import AgentError, check_api, stream_agent
 from services.backend import logger
 from services.conversation import Conversation, Message, shorten
 from settings import (
-    AGENT_INIT_ERROR,
     AGENT_STEPS,
+    AGENT_UNAVAILABLE_HINT,
     APP_TAGLINE,
     ASSISTANT_AVATAR,
     CHAT_PLACEHOLDER,
@@ -48,12 +48,11 @@ def render_assistant_page() -> None:
 
 
 def _ensure_agent_ready() -> None:
-    """Charge l'agent ; arrête la page proprement s'il est indisponible."""
-    try:
-        get_agent()
-    except Exception:
-        logger.exception("Impossible d'initialiser l'agent Hɛnnu")
-        st.error(AGENT_INIT_ERROR, icon=":material/cloud_off:")
+    """Vérifie que l'API répond ; arrête la page proprement sinon."""
+    available, message = check_api()
+    if not available:
+        logger.warning(f"API indisponible : {message}")
+        st.error(f"{message}\n\n{AGENT_UNAVAILABLE_HINT}", icon=":material/cloud_off:")
         st.stop()
 
 
@@ -152,6 +151,10 @@ def _run_agent(question: str) -> Message:
             result.update(data)
             done[node] = _step_detail(node, data)
             progress.html(templates.steps(_steps_view(done)))
+    except AgentError as error:
+        logger.warning(f"Réponse impossible : {error}")
+        progress.empty()
+        return Message(role="assistant", content=str(error), is_error=True)
     except Exception:
         logger.exception("Erreur pendant l'exécution de l'agent")
         progress.empty()
