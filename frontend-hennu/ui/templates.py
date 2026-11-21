@@ -196,6 +196,103 @@ def excerpt(index: int, title: str, content: str) -> str:
     )
 
 
+# ------------------------------------------------------------------
+# Base documentaire
+# ------------------------------------------------------------------
+
+def _meta_line(parts: list[str]) -> str:
+    return " · ".join(escape(part) for part in parts if part)
+
+
+def documents_header(title: str, text: str, stats: list[tuple[str, str]]) -> str:
+    stats_html = "".join(
+        '<div class="hn-docs-stat">'
+        f'<span class="hn-docs-stat__value">{escape(value)}</span>'
+        f'<span class="hn-docs-stat__label">{escape(label)}</span>'
+        "</div>"
+        for value, label in stats
+    )
+    return (
+        '<header class="hn-docs-header">'
+        "<div>"
+        f"<h1>{escape(title)}</h1>"
+        f"<p>{escape(text)}</p>"
+        "</div>"
+        f'<div class="hn-docs-stats">{stats_html}</div>'
+        "</header>"
+    )
+
+
+def document_card(title: str, description: str, file_type: str, meta: list[str]) -> str:
+    description_html = ""
+    if description:
+        description_html = f'<p class="hn-doc-card__text">{escape(description)}</p>'
+    return (
+        '<article class="hn-doc-card">'
+        '<div class="hn-doc-card__cover">'
+        f'{icon("description")}'
+        f'<span class="hn-doc-card__type">{escape(file_type.upper())}</span>'
+        "</div>"
+        f'<h3 class="hn-doc-card__title">{escape(title)}</h3>'
+        f"{description_html}"
+        f'<div class="hn-doc-card__meta">{_meta_line(meta)}</div>'
+        "</article>"
+    )
+
+
+def reader_header(title: str, description: str, meta: list[str]) -> str:
+    description_html = f"<p>{escape(description)}</p>" if description else ""
+    return (
+        '<header class="hn-reader-header">'
+        f"<h1>{escape(title)}</h1>"
+        f"{description_html}"
+        f'<div class="hn-reader-header__meta">{_meta_line(meta)}</div>'
+        "</header>"
+    )
+
+
+def form_intro(title: str, text: str) -> str:
+    return (
+        '<div class="hn-form-intro">'
+        f"<h3>{escape(title)}</h3>"
+        f"<p>{escape(text)}</p>"
+        "</div>"
+    )
+
+
+def empty_note(text: str) -> str:
+    return f'<div class="hn-empty-note">{icon("search_off")}{escape(text)}</div>'
+
+
+def admin_item(
+    title: str,
+    description: str,
+    meta: list[str],
+    status: str,
+    status_label: str,
+    message: str,
+) -> str:
+    """Ligne d'un document dans l'espace administrateur."""
+    description_html = ""
+    if description:
+        description_html = f'<p class="hn-admin-item__text">{escape(description)}</p>'
+    message_html = ""
+    if message:
+        message_html = f'<p class="hn-admin-item__message">{escape(message)}</p>'
+    return (
+        f'<div class="hn-admin-item is-{escape(status)}">'
+        '<div class="hn-admin-item__head">'
+        f'<span class="hn-admin-item__title">{escape(title)}</span>'
+        f'<span class="hn-status-badge is-{escape(status)}">'
+        f"{escape(status_label)}</span>"
+        "</div>"
+        f"{description_html}"
+        f'<div class="hn-admin-item__meta">{_meta_line(meta)}</div>'
+        f"{message_html}"
+        "</div>"
+    )
+
+
 def footer(name: str, year: int) -> str:
     return (
         '<footer class="hn-footer">'
