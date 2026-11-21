@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from settings import APP_NAME, ASSISTANT_PAGE, HOME_PAGE
+from settings import APP_NAME, ASSISTANT_PAGE, DOCUMENTS_PAGE, HOME_PAGE
 from ui import templates
 
 
@@ -18,14 +18,10 @@ def render_navbar() -> None:
 
         st.page_link(HOME_PAGE, label="Accueil", icon=":material/home:")
 
-        # Future page : regroupera tous les textes douaniers
-        st.button(
-            "Base documentaire",
-            key="nav_documents",
+        st.page_link(
+            DOCUMENTS_PAGE,
+            label="Base documentaire",
             icon=":material/library_books:",
-            type="tertiary",
-            disabled=True,
-            help="Bientôt disponible : tous les textes douaniers réunis.",
         )
 
         with st.container(key="nav_cta", width="content"):
