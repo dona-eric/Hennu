@@ -17,6 +17,7 @@ CSS_FILES = (
     "layout.css",
     "home.css",
     "chat.css",
+    "documents.css",
 )
 
 # Identité de l'application
@@ -30,6 +31,19 @@ COPYRIGHT_YEAR = 2026
 # Routers
 HOME_PAGE = "views/home.py"
 ASSISTANT_PAGE = "views/assistant.py"
+DOCUMENTS_PAGE = "views/documents.py"
+
+# Base documentaire
+UPLOAD_MAX_MB = 50
+DOCUMENT_STATUS_LABELS = {
+    "pending": "En attente de validation",
+    "approved": "En file d'attente",
+    "processing": "Ingestion en cours",
+    "ready": "Publié",
+    "failed": "Échec",
+    "rejected": "Refusé / retiré",
+}
+STATUS_REFRESH_SECONDS = 4  # rafraîchissement de l'admin pendant une ingestion
 
 # Contenu de la page d'accueil
 
