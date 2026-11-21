@@ -1,0 +1,54 @@
+/* =================================================================
+   Hɛnnu — Jetons de design (couleurs, typo, rayons, mouvement)
+   Toutes les autres feuilles utilisent ces variables.
+   ================================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block");
+
+:root {
+    /* Couleurs institutionnelles */
+    --hn-green-900: #072F24;
+    --hn-green-800: #0B4F3C;
+    --hn-green-600: #1C6B53;
+    --hn-green-100: #E4EEE9;
+    --hn-green-50: #F1F6F3;
+    --hn-gold-500: #C9A227;
+    --hn-gold-300: #E3C766;
+    --hn-gold-100: #F6EDCF;
+    --hn-rust-500: #B5652D;
+
+    /* Surfaces et textes */
+    --hn-paper: #F7F5EF;
+    --hn-surface: #FFFFFF;
+    --hn-line: #E6E1D3;
+    --hn-line-strong: #D5CEBB;
+    --hn-ink: #1F2A24;
+    --hn-ink-muted: #5A6660;
+    --hn-ink-soft: #8A938E;
+
+    /* Typographie */
+    --hn-font-title: "Source Serif 4", Georgia, serif;
+    --hn-font-body: "IBM Plex Sans", system-ui, sans-serif;
+    --hn-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+    /* Rayons */
+    --hn-radius-sm: 8px;
+    --hn-radius-md: 14px;
+    --hn-radius-lg: 22px;
+    --hn-radius-pill: 999px;
+
+    /* Ombres */
+    --hn-shadow-xs: 0 1px 2px rgba(11, 79, 60, 0.06);
+    --hn-shadow-sm: 0 2px 8px rgba(11, 79, 60, 0.07);
+    --hn-shadow-md: 0 10px 30px -12px rgba(11, 79, 60, 0.25);
+    --hn-shadow-lg: 0 24px 60px -24px rgba(7, 47, 36, 0.45);
+    --hn-ring: 0 0 0 3px rgba(201, 162, 39, 0.35);
+
+    /* Mouvement */
+    --hn-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --hn-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --hn-fast: 160ms;
+    --hn-base: 320ms;
+    --hn-slow: 640ms;
+}
