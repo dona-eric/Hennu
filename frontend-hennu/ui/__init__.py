@@ -1,1 +1,1 @@
-"""Composants d'interface Streamlit de Hɛnnu."""
+"""Composants d'interface Streamlit de Orion."""

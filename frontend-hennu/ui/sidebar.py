@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from services import conversation as session
+from service import conversation as session
 from settings import APP_NAME, APP_TAGLINE, HOME_PAGE
 from ui import templates
 

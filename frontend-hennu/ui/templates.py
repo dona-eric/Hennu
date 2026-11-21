@@ -71,7 +71,7 @@ def section_heading(eyebrow: str, title: str) -> str:
 
 
 def features(items: tuple[tuple[str, str, str], ...]) -> str:
-    """Grille « Ce que fait Hɛnnu » : (icône, titre, texte)."""
+    """Grille « Ce que fait Orion » : (icône, titre, texte)."""
     cards = "".join(
         '<div class="hn-feature">'
         f'<div class="hn-feature__icon">{icon(name)}</div>'
@@ -97,7 +97,7 @@ def how_it_works(items: tuple[tuple[str, str], ...]) -> str:
 
 
 def module_card(icon_name: str, title: str, text: str, badge: str) -> str:
-    """Carte d'un module de Hɛnnu (assistant, audit, base documentaire)."""
+    """Carte d'un module de Orion (assistant, audit, base documentaire)."""
     return (
         '<div class="hn-card">'
         '<div class="hn-card__top">'

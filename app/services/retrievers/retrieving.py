@@ -171,7 +171,7 @@ def build_article_index(docstore: SimpleDocumentStore) -> dict[str, list[BaseNod
 def find_articles_in_question(question: str, article_index: dict) -> list[BaseNode]:
     """Si la question cite "article N", renvoie directement cet article (sans recherche vectorielle)."""
     articles = []
-    # 1) on repère le groupe "articles 330 et 335", 2) on en extrait chaque numéro
+    # on repère le groupe articles on en extrait chaque numéro
     for match in ARTICLE_IN_QUESTION.finditer(question):
         for number, suffix in re.findall(ARTICLE_NUMBER, match.group(1), re.IGNORECASE):
             key = article_number(number, suffix)

@@ -205,11 +205,9 @@ RAG_SYSTEM_PROMPT = PromptTemplate(
     - Puis donne quand même une réponse générale en commençant par : "Je pense que..."
     4. Ne cite pas de sources inexistantes.
     5. Sois concis et précis.
-    6. ALWAYS cite your sources using [1], [2], etc. after each claim
-    7. Distinguish clearly between what is stated in the context vs your interpretation
-    8. If context is insufficient, say so in the user's language
-
-
+    6. TOujour citer tes sources utilisées [1], [2], etc. after each claim
+    7. Distingue clairement between what is stated in the context vs your interpretation
+    8. Si le contexte est insuffisant,dis-le dans un langage humain et comprehensif
 
     Contexte extrait de la base de données :
     {context}""",
@@ -220,11 +218,11 @@ RAG_SYSTEM_PROMPT = PromptTemplate(
 
 # Version 1.0.1 : même structure que la 1.0 (contexte dans le prompt
 # système, citations [1], [2]...), mais sans réponse « au jugé » :
-# en droit douanier, Hɛnnu ne répond qu'à partir des textes fournis.
+# en droit douanier, Orion ne répond qu'à partir des textes fournis.
 RAG_SYSTEM_PROMPT_V101 = PromptTemplate(
     name="rag_agentic_system_prompt",
     version="1.0.1",
-    template="""Tu es Hɛnnu, un assistant expert de la réglementation douanière
+    template="""Tu es Orion, un assistant expert de la réglementation douanière
 béninoise (Code des Douanes du Bénin, Port Autonome de Cotonou, Douanes Béninoises).
 Tu t'adresses à des commissionnaires en douane agréés et à des professionnels exigeants.
 
@@ -247,7 +245,7 @@ RÈGLES IMPORTANTES :
 
 Contexte extrait de la base documentaire :
 {context}""",
-    description="System prompt Hɛnnu : réponses sourcées, sans invention",
+    description="System prompt Orion : réponses sourcées, sans invention",
     variables=["context"],
 )
 
@@ -271,6 +269,98 @@ Question : {question}""",
 )
 
 
+# ------------------------------------------------------------------
+# Templates de la boucle agentic (évaluer, réessayer, vérifier)
+# ------------------------------------------------------------------
+
+QUERY_REFINE_PROMPT = PromptTemplate(
+    name="rag_query_refine",
+    version="1.0.1",
+    template="""Tu es un expert de la législation douanière béninoise.
+Une première recherche dans la base documentaire n'a pas suffi pour répondre
+à la question. Propose UNE nouvelle requête de recherche, formulée autrement.
+
+Question de l'utilisateur : {question}
+
+Requêtes déjà essayées :
+{tried_queries}
+
+Pourquoi les documents trouvés ne suffisaient pas : {reason}
+
+Règles :
+- Change d'angle : synonymes juridiques, notion plus générale ou plus précise,
+  nom du régime ou de la procédure concernée.
+- Ne répète pas une requête déjà essayée.
+- N'ajoute aucune information absente de la question.
+- Retourne uniquement la nouvelle requête, sans commentaire.""",
+    description="Nouvelle requête quand la recherche précédente est insuffisante",
+    variables=["question", "tried_queries", "reason"],
+)
+
+
+DOCUMENT_GRADER_PROMPT = PromptTemplate(
+    name="rag_document_grader",
+    version="1.0.1",
+    template="""Tu évalues des extraits de textes douaniers béninois pour un assistant.
+
+Question : {question}
+
+Extraits numérotés :
+{documents}
+
+Pour chaque extrait, décide s'il aide réellement à répondre à la question.
+Puis décide si les extraits pertinents, ensemble, suffisent pour répondre.
+
+Réponds UNIQUEMENT avec un objet JSON, sans texte autour :
+{"relevant": [numéros des extraits pertinents], "sufficient": true ou false,
+ "reason": "une phrase expliquant ce qui manque, ou pourquoi c'est suffisant"}""",
+    description="Évaluation de la pertinence des documents retrouvés (JSON)",
+    variables=["question", "documents"],
+)
+
+
+ANSWER_VERIFIER_PROMPT = PromptTemplate(
+    name="rag_answer_verifier",
+    version="1.0.1",
+    template="""Tu vérifies une réponse rédigée à partir de textes douaniers béninois.
+
+Sources numérotées :
+{sources}
+
+Réponse à vérifier :
+{answer}
+
+Vérifie que chaque affirmation de la réponse (règle, taux, délai, procédure,
+numéro d'article) est appuyée par les sources, et que chaque citation [n]
+renvoie bien à une source qui dit ce qui est affirmé.
+Une phrase qui indique simplement qu'une information est absente des sources
+n'est pas une erreur.
+
+Réponds UNIQUEMENT avec un objet JSON, sans texte autour :
+{"grounded": true ou false,
+ "unsupported": ["affirmation non appuyée par les sources", ...]}""",
+    description="Vérification que la réponse est fondée sur les sources (JSON)",
+    variables=["sources", "answer"],
+)
+
+
+ANSWER_REVISION_PROMPT = PromptTemplate(
+    name="rag_answer_revision",
+    version="1.0.1",
+    template="""{question}
+
+---
+Une vérification de ta réponse précédente a relevé ces problèmes :
+{issues}
+
+Rédige de nouveau ta réponse en t'en tenant strictement aux sources du contexte :
+retire ou corrige les affirmations non appuyées, cite uniquement des sources
+existantes, et indique clairement ce que les textes ne précisent pas.""",
+    description="Demande de révision après une vérification échouée",
+    variables=["question", "issues"],
+)
+
+
 def create_default_prompt_manager() -> PromptManager:
     """
     Crée un gestionnaire de prompts avec les templates par défaut.
@@ -286,6 +376,10 @@ def create_default_prompt_manager() -> PromptManager:
         RAG_SYSTEM_PROMPT,
         RAG_SYSTEM_PROMPT_V101,
         QUERY_REWRITE_PROMPT,
+        QUERY_REFINE_PROMPT,
+        DOCUMENT_GRADER_PROMPT,
+        ANSWER_VERIFIER_PROMPT,
+        ANSWER_REVISION_PROMPT,
     )
 
     for template in default_templates:

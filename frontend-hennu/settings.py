@@ -1,4 +1,4 @@
-"""Paramètres et textes de l'interface Hɛnnu.
+"""Paramètres et textes de l'interface Orion.
 Tout ce qui est « réglable » (textes, icônes, délais, fichiers CSS)
 se trouve ici pour ne pas avoir à fouiller dans le code.
 """
@@ -6,8 +6,8 @@ se trouve ici pour ne pas avoir à fouiller dans le code.
 import os
 from pathlib import Path
 
-# API Hɛnnu (l'agent RAG tourne dans l'API FastAPI)
-API_URL = os.getenv("HENNU_API_URL", "http://localhost:8000").rstrip("/")
+# API Orion (l'agent RAG tourne dans l'API FastAPI)
+API_URL = os.getenv("Orion_API_URL", "http://localhost:8000").rstrip("/")
 API_TIMEOUT_SECONDS = 300  # durée maximale d'une réponse
 
 FRONTEND_DIR = Path(__file__).resolve().parent
@@ -26,10 +26,10 @@ CSS_FILES = (
 )
 
 # Identité de l'application
-APP_NAME = "Hɛnnu"
+APP_NAME = "Orion"
 APP_TAGLINE = "Intelligence réglementaire douanière"
 APP_ORGANISATION = "La Douane Béninoise"
-PAGE_TITLE = f"{APP_NAME} — Intelligence réglementaire douanière"
+PAGE_TITLE = f"{APP_NAME} - Intelligence réglementaire douanière"
 PAGE_ICON = "⚖️"
 COPYRIGHT_YEAR = 2026
 
@@ -54,22 +54,22 @@ STATUS_REFRESH_SECONDS = 4  # rafraîchissement de l'admin pendant une ingestion
 
 HERO_TEXT = (
     "Votre assistant pour comprendre la réglementation douanière béninoise : "
-    "posez une question, Hɛnnu retrouve les textes applicables et vous répond "
-    "en citant ses sources."
+    "posez une question, Orion retrouve les infos applicables, vérifie tout "
+    "et vous allège les taches de recherche"
 )
 
-# Ce que fait Hɛnnu : (icône Material, titre, texte)
+# Ce que fait Orion
 FEATURES = (
     (
         "travel_explore",
-        "Recherche dans les textes",
-        "Hɛnnu parcourt le Code des Douanes et les manuels de procédures "
+        "Recherche dans milliers de documents",
+        "Orion parcourt le Code, les textes et les manuels "
         "pour retrouver les passages utiles à votre question.",
     ),
     (
         "verified",
         "Réponses sourcées",
-        "Chaque réponse cite les articles et documents sur lesquels elle "
+        "Chaque réponse cite est sourcée et documentées "
         "s'appuie, pour que vous puissiez toujours vérifier.",
     ),
     (
@@ -84,8 +84,8 @@ FEATURES = (
 HOW_IT_WORKS = (
     ("Vous posez votre question", "En langage courant, comme à un collègue."),
     (
-        "Hɛnnu analyse les textes",
-        "Il reformule la question et recherche les articles pertinents.",
+        "Orion analyse les textes",
+        "Il reformule la question et recherche les réponses pertinentes.",
     ),
     (
         "Vous recevez une réponse sourcée",
@@ -98,26 +98,32 @@ ASSISTANT_AVATAR = ":material/balance:"
 
 # Conversation
 
-CHAT_PLACEHOLDER = "Posez une question sur la réglementation douanière…"
-NEW_CONVERSATION_TITLE = "Nouvelle conversation"
+CHAT_PLACEHOLDER = "De quoi voulez-vous qu'on discute aujourd'hui ?"
+NEW_CONVERSATION_TITLE = "New chat"
 TITLE_MAX_LENGTH = 42
 
 EXAMPLE_QUESTIONS = (
     (":material/inventory_2:", "Quels sont les régimes suspensifs ?"),
     (":material/directions_car:", "Comment dédouaner un véhicule au Bénin ?"),
     (":material/category:", "Comment qualifier une marchandise ?"),
-    (
-        ":material/account_balance:",
-        "Qu'est-ce que le Prélèvement Communautaire de Solidarité ?",
-    ),
+    (":material/account_balance:","Qu'est-ce que le Prélèvement Communautaire de Solidarité ?",),
 )
 
-# Étapes du graphe LangGraph
+# Étapes du graphe LangGraph : (nœud, libellé, étape facultative)
+# Une étape facultative n'apparaît que si l'agent la parcourt.
 AGENT_STEPS = (
-    ("analyze_query", "Compréhension de la question"),
-    ("retrieve_docs", "Recherche dans les textes douaniers"),
-    ("generate_response", "Rédaction de la réponse"),
+    ("analyze_query", "Compréhension de la question", False),
+    ("refine_query", "Nouvelle recherche, formulée autrement", True),
+    ("retrieve_docs", "Recherche dans les textes douaniers", False),
+    ("grade_documents", "Évaluation des documents trouvés", False),
+    ("generate_response", "Rédaction de la réponse", False),
+    ("verify_answer", "Vérification des sources", False),
 )
+
+# Quand l'agent reboucle, ces étapes redeviennent « à faire »
+STEPS_RESTARTED_BY = {
+    "refine_query": ("retrieve_docs", "grade_documents"),
+}
 
 # Effet « machine à écrire » : durée maximale d'affichage d'une réponse
 TYPING_MAX_DURATION = 2.5  # secondes

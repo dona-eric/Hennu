@@ -1,4 +1,4 @@
-"""API Hɛnnu : point d'entrée unique vers l'agent RAG.
+"""API Orion : point d'entrée unique vers l'agent RAG.
 
 Lancement depuis la racine du projet :
     uvicorn app.api.routes:app --host 0.0.0.0 --port 8000
@@ -36,7 +36,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(
     title="HennuAPI",
-    description="API de l'assistant douanier Hɛnnu",
+    description="API de l'assistant douanier Orion",
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan,

@@ -62,7 +62,7 @@ def _register_existing_documents() -> None:
             priority=info.get("priority", DEFAULT_PRIORITY),
             status=DocumentStatus.READY if converted else DocumentStatus.FAILED,
             status_message="" if converted else "Document non converti : relancez.",
-            uploaded_by="Hɛnnu",
+            uploaded_by="Orion",
         )
         logger.info(f"Document d'origine enregistré : {path.name}")
 

@@ -1,4 +1,4 @@
-"""Page d'accueil : présentation de Hɛnnu et de ses modules.
+"""Page d'accueil : présentation de Orion et de ses modules.
 
 Pas de barre latérale ni de zone de saisie ici : la conversation
 s'ouvre sur la route /assistant (carte « Assistant douanier »).
@@ -29,7 +29,7 @@ def render_home() -> None:
     )
     _render_hero_actions()
 
-    _heading("Ce que fait Hɛnnu", "Le droit douanier, enfin accessible")
+    _heading("Ce que fait Orion", "La douane, à votre porté")
     st.html(templates.features(FEATURES))
 
     _heading("Comment ça marche", "Trois étapes, une réponse fiable")

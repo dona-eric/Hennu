@@ -6,10 +6,10 @@ from collections.abc import Iterator
 
 import streamlit as st
 
-from services import conversation as session
-from services.agent import AgentError, check_api, stream_agent
-from services.backend import logger
-from services.conversation import Conversation, Message, shorten
+from service import conversation as session
+from service.agent import AgentError, check_api, stream_agent
+from service.backend import logger
+from service.conversation import Conversation, Message, shorten
 from settings import (
     AGENT_STEPS,
     AGENT_UNAVAILABLE_HINT,
@@ -20,6 +20,7 @@ from settings import (
     EMPTY_ANSWER,
     ERROR_ANSWER,
     EXAMPLE_QUESTIONS,
+    STEPS_RESTARTED_BY,
     TYPING_MAX_DURATION,
     TYPING_MAX_WORD_DELAY,
     USER_AVATAR,
@@ -149,7 +150,7 @@ def _run_agent(question: str) -> Message:
     try:
         for node, data in stream_agent(question):
             result.update(data)
-            done[node] = _step_detail(node, data)
+            _record_step(done, node, data)
             progress.html(templates.steps(_steps_view(done)))
     except AgentError as error:
         logger.warning(f"Réponse impossible : {error}")
@@ -170,14 +171,29 @@ def _run_agent(question: str) -> Message:
     )
 
 
+def _record_step(done: dict[str, str], node: str, data: dict) -> None:
+    """Marque une étape terminée et gère les boucles de l'agent."""
+    for restarted in STEPS_RESTARTED_BY.get(node, ()):
+        done.pop(restarted, None)
+
+    # Révision demandée : la rédaction et la vérification recommencent
+    if node == "verify_answer" and data.get("needs_revision"):
+        done.pop("generate_response", None)
+        return
+
+    done[node] = _step_detail(node, data)
+
+
 def _steps_view(done: dict[str, str]) -> list[tuple[str, str, str]]:
     """Calcule l'état de chaque étape : terminée, en cours ou à venir."""
     view = []
     active_found = False
 
-    for node, label in AGENT_STEPS:
+    for node, label, optional in AGENT_STEPS:
         if node in done:
             view.append((label, done[node], "done"))
+        elif optional:
+            continue  # étape facultative pas (encore) parcourue
         elif not active_found:
             view.append((label, "", "active"))
             active_found = True
@@ -189,15 +205,30 @@ def _steps_view(done: dict[str, str]) -> list[tuple[str, str, str]]:
 
 def _step_detail(node: str, data: dict) -> str:
     """Petit résumé affiché sous une étape terminée."""
-    if node == "analyze_query":
+    if node in ("analyze_query", "refine_query"):
         query = data.get("rewritten_user_query", "")
         return f"« {shorten(query, 90)} »" if query else ""
 
     if node == "retrieve_docs":
-        count = len(data.get("sources", []))
+        count = data.get("candidate_count", len(data.get("sources", [])))
         if count == 0:
             return "Aucun texte trouvé"
-        return f"{count} {_plural(count, 'texte pertinent', 'textes pertinents')}"
+        return f"{count} {_plural(count, 'texte trouvé', 'textes trouvés')}"
+
+    if node == "grade_documents":
+        kept = len(data.get("sources", []))
+        if kept == 0:
+            return "Aucun document pertinent"
+        verdict = "suffisant" if data.get("documents_sufficient") else "incomplet"
+        label = _plural(kept, "document retenu", "documents retenus")
+        return f"{kept} {label} · {verdict}"
+
+    if node == "generate_response":
+        attempt = data.get("generation_attempts", 1)
+        return "Réponse révisée" if attempt > 1 else "Terminé"
+
+    if node == "verify_answer":
+        return "Réponse vérifiée" if data.get("grounded") else "Vérification partielle"
 
     return "Terminé"
 

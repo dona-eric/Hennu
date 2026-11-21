@@ -1,5 +1,5 @@
 /* =================================================================
-   Hɛnnu — Page d'accueil
+   Orion — Page d'accueil
    ================================================================= */
 
 /* La page d'accueil est plus large que la conversation */
@@ -220,7 +220,7 @@
     font-size: clamp(1.5rem, 3vw, 2rem);
 }
 
-/* ---------- Ce que fait Hɛnnu ---------- */
+/* ---------- Ce que fait Orion ---------- */
 
 .hn-features {
     display: grid;

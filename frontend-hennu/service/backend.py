@@ -1,4 +1,4 @@
-"""Pont unique vers le backend Hɛnnu (package `app`).
+"""Pont unique vers le backend Orion (package `app`).
 
 Le frontend vit dans un sous-dossier du projet : on ajoute la racine
 au chemin Python pour pouvoir importer app, quel que soit le dossier

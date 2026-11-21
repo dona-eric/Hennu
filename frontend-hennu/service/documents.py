@@ -4,7 +4,7 @@ import hmac
 
 import streamlit as st
 
-from services.backend import ADMIN_PASSWORD, library, logger
+from service.backend import ADMIN_PASSWORD, library, logger
 
 
 @st.cache_resource(show_spinner=False)

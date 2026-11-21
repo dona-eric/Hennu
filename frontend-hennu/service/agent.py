@@ -1,4 +1,4 @@
-"""Client HTTP de l'API Hɛnnu (l'agent RAG tourne dans l'API, pas ici).
+"""Client HTTP de l'API Orion (l'agent RAG tourne dans l'API, pas ici).
 
 L'interface reçoit la progression de l'agent en direct grâce à la
 route POST /ask/stream (Server-Sent Events).
@@ -27,7 +27,7 @@ def check_api() -> tuple[bool, str]:
         response = httpx.get(f"{API_URL}/health", timeout=CONNECT_TIMEOUT)
         response.raise_for_status()
     except httpx.HTTPError:
-        return False, f"L'API Hɛnnu est injoignable ({API_URL})."
+        return False, f"L'API Orion est injoignable ({API_URL})."
 
     if not response.json().get("agent_ready"):
         return False, "L'assistant démarre, réessayez dans quelques instants."
@@ -56,7 +56,7 @@ def stream_agent(question: str) -> Iterator[tuple[str, dict]]:
     except httpx.TimeoutException as error:
         raise AgentError("L'assistant a mis trop de temps à répondre.") from error
     except httpx.TransportError as error:
-        raise AgentError(f"L'API Hɛnnu est injoignable ({API_URL}).") from error
+        raise AgentError(f"L'API Orion est injoignable ({API_URL}).") from error
 
 
 def _raise_for_status(response: httpx.Response) -> None:

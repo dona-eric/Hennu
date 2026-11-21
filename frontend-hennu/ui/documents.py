@@ -7,8 +7,8 @@ n'est proposé.
 
 import streamlit as st
 
-from services import documents as docs_service
-from services.backend import library
+from service import documents as docs_service
+from service.backend import library
 from settings import (
     APP_NAME,
     COPYRIGHT_YEAR,
@@ -39,7 +39,7 @@ def _render_index() -> None:
     st.html(
         templates.documents_header(
             "Base documentaire",
-            "Les textes douaniers sur lesquels s'appuie Hɛnnu, "
+            "Les textes douaniers sur lesquels s'appuie Orion, "
             "consultables directement en ligne.",
             stats=[
                 (str(len(published)), "documents publiés"),

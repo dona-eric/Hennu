@@ -33,7 +33,6 @@ class Document(Base):
     __tablename__ = "documents"
 
     # Pour les documents d'origine : nom du fichier sans extension
-    # (c'est aussi le `document_id` des nœuds dans Qdrant)
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     title: Mapped[str] = mapped_column(String(300))
     description: Mapped[str] = mapped_column(Text, default="")

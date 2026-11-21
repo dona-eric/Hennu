@@ -27,11 +27,7 @@ PROVIDER_BASE_URLS = {
 # Les prompts sont dans app/services/llms/prompts_manager.py
 
 
-def build_llm(
-    provider: dict[str, Any],
-    model: str | None = None,
-    max_retries: int = 2,
-) -> OpenAILike:
+def build_llm(provider: dict[str, Any], model: str | None = None, max_retries: int = 2,) -> OpenAILike:
     """Crée un client LLM à partir d'une entrée `llm.<provider>` du YAML.
 
     `model` permet de choisir un autre modèle du même fournisseur
@@ -60,12 +56,8 @@ def build_llm(
     )
 
 
-def ask_llm(
-    llm: OpenAILike,
-    prompt: str,
-    system_prompt: str | None = None,
-    fallback_llm: OpenAILike | None = None,
-) -> str:
+def ask_llm(llm: OpenAILike, prompt: str, system_prompt: str | None = None,
+fallback_llm: OpenAILike | None = None,) -> str:
     """Envoie une question au LLM et renvoie le texte de sa réponse.
 
     Si le modèle est indisponible (surcharge, quota...) et qu'un modèle
@@ -73,7 +65,12 @@ def ask_llm(
     """
     messages = []
     if system_prompt:
-        messages.append(ChatMessage(role="system", content=system_prompt))
+        messages.append(
+            ChatMessage(
+                role="system", 
+                content=system_prompt
+                )
+            )
     messages.append(ChatMessage(role="user", content=prompt))
 
     try:
@@ -89,9 +86,7 @@ def ask_llm(
     return (response.message.content or "").strip()
 
 
-# ------------------------------------------------------------------
 # Création des clients à partir du YAML
-# ------------------------------------------------------------------
 
 _llm_config = get_config().section("llm")
 _first = _llm_config["provider_first"]
@@ -109,8 +104,7 @@ else:
 
 Settings.llm = main_llm
 
-logger.info(
-    "LLM : principal=%s, rapide=%s, secours=%s",
+logger.info("LLM : principal=%s, rapide=%s, secours=%s",
     main_llm.model,
     fast_llm.model,
     fallback_llm.model,

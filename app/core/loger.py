@@ -12,7 +12,7 @@ LOG_FILE = os.path.join(LOG_DIR, "application.log")
 LOGGING_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 
-def setup_logging(name: str = 'Hɛnnu AI') -> logging.Logger:
+def setup_logging(name: str = 'Orion AI') -> logging.Logger:
     logger = logging.getLogger(name)
 
     # Évite d'ajouter de nouveaux handlers si le logger est déjà configuré
