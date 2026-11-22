@@ -32,9 +32,7 @@ DOCSTORE_DIR = PROJECT_ROOT / "data" / "docstore"
 DOCSTORE_PATH = DOCSTORE_DIR / "docstore.json"
 
 
-# ------------------------------------------------------------------
 # Préparation des nœuds
-# ------------------------------------------------------------------
 
 def document_metadata(document_id: str) -> tuple[str, int, str]:
     """Titre, priorité et nom du fichier source d'un document.
@@ -74,9 +72,7 @@ def build_document_nodes(
     return all_nodes, leaf_nodes
 
 
-# ------------------------------------------------------------------
 # Accès au docstore et à Qdrant
-# ------------------------------------------------------------------
 
 def load_docstore() -> SimpleDocumentStore:
     if DOCSTORE_PATH.exists():
@@ -97,10 +93,7 @@ def _qdrant_store() -> QdrantVectorStore:
     return QdrantVectorStore(client=store.client, collection_name=store.collection_name)
 
 
-# ------------------------------------------------------------------
 # Ingestion d'un seul document
-# ------------------------------------------------------------------
-
 def index_document(document_id: str, markdown: str) -> int:
     """Ajoute un document à Qdrant et au docstore ; renvoie le nombre de passages.
 
@@ -147,9 +140,7 @@ def remove_document_from_index(document_id: str) -> None:
     logger.info(f"Document {document_id} retiré de l'index ({len(node_ids)} nœuds).")
 
 
-# ------------------------------------------------------------------
 # Ré-ingestion complète (python ingest.py)
-# ------------------------------------------------------------------
 
 def ingest_documents():
     """Lit tous les Markdown, construit les nœuds et reconstruit l'index."""

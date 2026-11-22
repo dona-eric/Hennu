@@ -11,8 +11,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
-import fitz  # PyMuPDF
-
+# import fitz  # PyMuPDF
+import pymupdf
 from app.core.loger import setup_logging
 from app.database.models import Document
 
@@ -93,15 +93,15 @@ def preview_pdf(document: Document) -> Path | None:
 
 
 def count_pages(pdf: Path) -> int:
-    with fitz.open(pdf) as document:
+    with pymupdf.open(pdf) as document:
         return document.page_count
 
 
 def render_page(pdf: Path, page_number: int, zoom: float = PAGE_ZOOM) -> bytes:
     """Image PNG d'une page (numérotée à partir de 1)."""
-    with fitz.open(pdf) as document:
+    with pymupdf.open(pdf) as document:
         page = document.load_page(page_number - 1)
-        pixmap = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
+        pixmap = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), alpha=False)
         return pixmap.tobytes("png")
 
 

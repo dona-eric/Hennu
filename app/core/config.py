@@ -46,14 +46,12 @@ DOCUMENTS = {
 DEFAULT_PRIORITY = 4
 
 
-# --- Services annexes ---
+# Services annexes
 DATALAB_API_KEY = os.getenv("marker_api_key")
-API_KEY_GROQ = os.getenv("GROQ_API_KEY")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 TOKEN_HUGGINGFACE = os.getenv("HUGGINGFACE_TOKEN")
 
 
 # --- Base documentaire ---
 # Mot de passe de l'espace d'administration (validation des documents).
-# Sans cette variable dans le .env, l'administration est désactivée.
 ADMIN_PASSWORD = os.getenv("HENNU_ADMIN_PASSWORD")

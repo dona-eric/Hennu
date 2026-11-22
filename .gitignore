@@ -7,6 +7,7 @@ __pycache__/
 cache/
 *.pdf
 *.docx
+*.xlsx
 .ruff_cache/
 data/processed_data/*.md
 

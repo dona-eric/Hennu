@@ -16,9 +16,9 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # Ces imports doivent venir après la mise à jour du chemin Python
-from app.core.config import ADMIN_PASSWORD  # noqa: E402
-from app.core.loger import setup_logging  # noqa: E402
-from app.services.documents import library  # noqa: E402
+from app.core.config import ADMIN_PASSWORD
+from app.core.loger import setup_logging
+from app.services.documents import library
 
 # Les erreurs sont écrites dans logs/application.log
 logger = setup_logging()

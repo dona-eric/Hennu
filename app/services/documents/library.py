@@ -11,7 +11,7 @@ import re
 import threading
 from uuid import uuid4
 
-from app.core.config import DEFAULT_PRIORITY, DOCUMENTS
+from app.core.config import DEFAULT_PRIORITY, DOCUMENTS, DATALAB_API_KEY
 from app.core.loger import setup_logging
 from app.database.models import Document, DocumentStatus
 from app.services.documents import repository, storage
@@ -20,7 +20,7 @@ from app.services.processing.ingestion import (
     remove_document_from_index,
 )
 from app.services.processing.loader import get_files
-from app.services.processing.parser import convert_to_markdown
+from app.services.processing.parser import IParser, DATALAB_URL, DATALAB_TIMEOUT
 
 logger = setup_logging()
 
@@ -246,7 +246,7 @@ def _ingest(document_id: str) -> None:
             markdown_file = storage.markdown_path(document_id)
             if not markdown_file.exists():
                 _set_progress(document_id, "Conversion du document en texte…")
-                markdown = convert_to_markdown(storage.source_path(document))
+                markdown = IParser(url_datalab=DATALAB_URL, api_key=DATALAB_API_KEY, timeout=DATALAB_TIMEOUT).convert_to_markdown(storage.source_path(document))
                 markdown_file.parent.mkdir(parents=True, exist_ok=True)
                 markdown_file.write_text(markdown, encoding="utf-8")
 

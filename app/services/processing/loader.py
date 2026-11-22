@@ -6,7 +6,7 @@ from app.core.loger import setup_logging
 
 logger = setup_logging(__name__)
 
-data = Path(__file__).resolve().parents[3] / "data"
+data = Path(__file__).resolve().parents[3] / "data" / 'raws'
 
 SOURCE_EXTENSIONS = (".pdf", ".docx", ".txt", ".xlsx")
 
