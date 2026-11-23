@@ -1,0 +1,499 @@
+/* =================================================================
+   Orion — Page d'accueil
+   ================================================================= */
+
+/* La page d'accueil est plus large que la conversation */
+[data-testid="stMainBlockContainer"]:has(.st-key-navbar) {
+    max-width: 1120px;
+    padding-top: 1.25rem;
+    padding-bottom: 2rem;
+}
+
+/* ---------- Barre de navigation ---------- */
+
+.st-key-navbar {
+    position: sticky;
+    top: 0.75rem;
+    z-index: 50;
+    margin-bottom: 1.5rem;
+    padding: 0.55rem 0.75rem 0.55rem 1.1rem;
+    border: 1px solid var(--hn-line);
+    border-radius: var(--hn-radius-pill);
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow: var(--hn-shadow-sm);
+    animation: hn-fade var(--hn-slow) var(--hn-ease-out) both;
+}
+
+.hn-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--hn-font-title);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--hn-green-900);
+}
+
+.hn-nav-brand__mark {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--hn-green-800);
+    color: var(--hn-gold-300);
+    font-size: 0.95rem;
+}
+
+/* Liens de navigation */
+.st-key-navbar [data-testid="stPageLink-NavLink"] {
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--hn-radius-pill);
+    transition: background-color var(--hn-fast) ease;
+}
+
+.st-key-navbar [data-testid="stPageLink-NavLink"] p,
+.st-key-navbar [data-testid="stPageLink-NavLink"] span {
+    color: var(--hn-ink);
+    font-weight: 500;
+}
+
+.st-key-navbar [data-testid="stPageLink-NavLink"]:hover {
+    background: var(--hn-green-50);
+}
+
+/* Bouton d'action principal de la barre */
+.st-key-nav_cta [data-testid="stPageLink-NavLink"] {
+    background: var(--hn-green-800);
+    box-shadow: var(--hn-shadow-sm);
+    transition:
+        background-color var(--hn-fast) ease,
+        transform var(--hn-fast) var(--hn-ease-out);
+}
+
+.st-key-nav_cta [data-testid="stPageLink-NavLink"] p,
+.st-key-nav_cta [data-testid="stPageLink-NavLink"] span {
+    color: #FFFFFF;
+}
+
+.st-key-nav_cta [data-testid="stPageLink-NavLink"]:hover {
+    background: var(--hn-green-600);
+    transform: translateY(-1px);
+}
+
+/* ---------- Bandeau principal ---------- */
+
+.hn-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 4.2rem 2rem 3.2rem;
+    border-radius: var(--hn-radius-lg);
+    background: linear-gradient(140deg, var(--hn-green-800) 0%, var(--hn-green-900) 100%);
+    box-shadow: var(--hn-shadow-lg);
+    text-align: center;
+    isolation: isolate;
+    animation: hn-rise var(--hn-slow) var(--hn-ease-out) both;
+}
+
+/* Motif géométrique très léger, évoquant un tampon officiel */
+.hn-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 22px),
+        repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 22px);
+}
+
+/* Halo doré qui dérive lentement */
+.hn-hero__glow {
+    position: absolute;
+    inset: -40%;
+    z-index: -1;
+    background:
+        radial-gradient(closest-side at 70% 30%, rgba(201, 162, 39, 0.28), transparent 70%),
+        radial-gradient(closest-side at 25% 75%, rgba(28, 107, 83, 0.55), transparent 70%);
+    animation: hn-drift 26s linear infinite;
+}
+
+.hn-hero__eyebrow {
+    margin: 0 0 0.7rem;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--hn-gold-300);
+    animation: hn-fade var(--hn-slow) var(--hn-ease-out) 120ms both;
+}
+
+.stApp .hn-hero__title {
+    margin: 0;
+    padding: 0;
+    font-family: var(--hn-font-title);
+    font-size: clamp(3rem, 8vw, 4.8rem);
+    font-weight: 700;
+    line-height: 1;
+    color: #FFFFFF;
+    animation: hn-rise var(--hn-slow) var(--hn-ease-out) 200ms both;
+}
+
+.hn-hero__rule {
+    display: block;
+    width: 72px;
+    height: 3px;
+    margin: 1.2rem auto 1rem;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--hn-gold-300), var(--hn-gold-500));
+    transform-origin: center;
+    animation: hn-draw var(--hn-slow) var(--hn-ease-out) 420ms both;
+}
+
+.hn-hero__tagline {
+    margin: 0 0 0.9rem;
+    font-family: var(--hn-font-title);
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--hn-gold-100);
+    animation: hn-fade var(--hn-slow) var(--hn-ease-out) 480ms both;
+}
+
+.hn-hero__text {
+    max-width: 600px;
+    margin: 0 auto;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: rgba(247, 245, 239, 0.8);
+    animation: hn-fade var(--hn-slow) var(--hn-ease-out) 560ms both;
+}
+
+/* Bouton sous le bandeau, qui chevauche son bord inférieur */
+.st-key-hero_actions {
+    margin-top: -1.9rem;
+    position: relative;
+    z-index: 2;
+    animation: hn-rise var(--hn-slow) var(--hn-ease-spring) 700ms both;
+}
+
+.st-key-hero_actions [data-testid="stPageLink-NavLink"] {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--hn-radius-pill);
+    background: var(--hn-gold-500);
+    box-shadow: 0 14px 30px -12px rgba(201, 162, 39, 0.8);
+    transition:
+        transform var(--hn-base) var(--hn-ease-spring),
+        background-color var(--hn-fast) ease;
+}
+
+.st-key-hero_actions [data-testid="stPageLink-NavLink"] p,
+.st-key-hero_actions [data-testid="stPageLink-NavLink"] span {
+    color: var(--hn-green-900);
+    font-weight: 600;
+}
+
+.st-key-hero_actions [data-testid="stPageLink-NavLink"]:hover {
+    background: var(--hn-gold-300);
+    transform: translateY(-2px) scale(1.03);
+}
+
+/* ---------- Titres de section ---------- */
+
+.hn-heading {
+    margin: 3.5rem 0 1.4rem;
+    text-align: center;
+    animation: hn-rise var(--hn-slow) var(--hn-ease-out) both;
+}
+
+.hn-heading__eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--hn-rust-500);
+}
+
+.stApp .hn-heading h2 {
+    margin: 0.35rem 0 0;
+    padding: 0;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+/* ---------- Ce que fait Orion ---------- */
+
+.hn-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.hn-feature {
+    padding: 1.5rem;
+    border: 1px solid var(--hn-line);
+    border-radius: var(--hn-radius-md);
+    background: var(--hn-surface);
+    box-shadow: var(--hn-shadow-xs);
+    animation: hn-rise var(--hn-slow) var(--hn-ease-out) both;
+    transition:
+        transform var(--hn-base) var(--hn-ease-out),
+        box-shadow var(--hn-base) var(--hn-ease-out);
+}
+
+.hn-feature:nth-child(2) { animation-delay: 90ms; }
+.hn-feature:nth-child(3) { animation-delay: 180ms; }
+
+.hn-feature:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--hn-shadow-md);
+}
+
+.hn-feature__icon {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    margin-bottom: 1rem;
+    border-radius: 13px;
+    background: var(--hn-green-50);
+    color: var(--hn-green-800);
+    transition: transform var(--hn-base) var(--hn-ease-spring);
+}
+
+.hn-feature:hover .hn-feature__icon {
+    transform: rotate(-8deg) scale(1.08);
+}
+
+.stApp .hn-feature h3 {
+    margin: 0 0 0.4rem;
+    padding: 0;
+    font-size: 1.1rem;
+}
+
+.hn-feature p {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--hn-ink-muted);
+}
+
+/* ---------- Comment ça marche ---------- */
+
+.hn-how {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: none;
+}
+
+.hn-how__step {
+    position: relative;
+    margin: 0;
+    padding: 1.4rem 1.4rem 1.3rem;
+    border-radius: var(--hn-radius-md);
+    background: linear-gradient(180deg, var(--hn-green-50), transparent);
+    border-top: 3px solid var(--hn-gold-500);
+    animation: hn-rise var(--hn-slow) var(--hn-ease-out) both;
+}
+
+.hn-how__step:nth-child(2) { animation-delay: 90ms; }
+.hn-how__step:nth-child(3) { animation-delay: 180ms; }
+
+.hn-how__number {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin-bottom: 0.8rem;
+    border-radius: 50%;
+    background: var(--hn-green-800);
+    color: var(--hn-gold-300);
+    font-family: var(--hn-font-title);
+    font-weight: 700;
+}
+
+.stApp .hn-how__step h3 {
+    margin: 0 0 0.3rem;
+    padding: 0;
+    font-size: 1.05rem;
+}
+
+.hn-how__step p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--hn-ink-muted);
+}
+
+/* ---------- Modules ---------- */
+
+.st-key-module_assistant,
+.st-key-module_audit,
+.st-key-module_documents {
+    height: 100%;
+    animation: hn-rise var(--hn-slow) var(--hn-ease-out) both;
+}
+
+.st-key-module_audit { animation-delay: 90ms; }
+.st-key-module_documents { animation-delay: 180ms; }
+
+.hn-card {
+    height: 100%;
+    padding: 1.5rem;
+    border: 1px solid var(--hn-line);
+    border-radius: var(--hn-radius-md);
+    background: var(--hn-surface);
+    box-shadow: var(--hn-shadow-xs);
+    transition:
+        transform var(--hn-base) var(--hn-ease-out),
+        box-shadow var(--hn-base) var(--hn-ease-out),
+        border-color var(--hn-base) ease;
+}
+
+.hn-card__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.hn-card__icon {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+    background: var(--hn-green-50);
+    color: var(--hn-green-800);
+}
+
+.hn-card__badge {
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--hn-radius-pill);
+    background: var(--hn-gold-100);
+    color: #7A5E0E;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.stApp .hn-card__title {
+    margin: 0 0 0.4rem;
+    padding: 0;
+    font-size: 1.15rem;
+}
+
+.hn-card__text {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--hn-ink-muted);
+}
+
+/* Module à venir : en retrait */
+.st-key-module_audit .hn-card {
+    background: linear-gradient(180deg, var(--hn-surface), var(--hn-green-50));
+    opacity: 0.85;
+}
+
+/* Carte « Base documentaire » : lien en bas de carte */
+.st-key-module_documents .hn-card {
+    padding-bottom: 3.6rem;
+}
+
+.st-key-module_documents .hn-card__badge {
+    background: var(--hn-green-100);
+    color: var(--hn-green-800);
+}
+
+.st-key-module_documents [data-testid="stElementContainer"]:has([data-testid="stPageLink"]) {
+    margin-top: -3.6rem;
+    padding-left: 1.5rem;
+}
+
+.st-key-module_documents [data-testid="stPageLink-NavLink"] {
+    padding: 0;
+    background: transparent;
+}
+
+.st-key-module_documents [data-testid="stPageLink-NavLink"] p,
+.st-key-module_documents [data-testid="stPageLink-NavLink"] span {
+    color: var(--hn-green-800);
+    font-weight: 600;
+}
+
+/* Carte « Assistant douanier » : entièrement cliquable */
+.st-key-module_assistant {
+    position: relative;
+}
+
+.st-key-module_assistant .hn-card {
+    border-color: rgba(11, 79, 60, 0.3);
+    padding-bottom: 3.6rem;
+}
+
+.st-key-module_assistant .hn-card__badge {
+    background: var(--hn-green-100);
+    color: var(--hn-green-800);
+}
+
+.st-key-module_assistant:hover .hn-card {
+    transform: translateY(-4px);
+    border-color: var(--hn-green-800);
+    box-shadow: var(--hn-shadow-md);
+}
+
+/* Le lien est remonté à l'intérieur de la carte */
+.st-key-module_assistant [data-testid="stElementContainer"]:has([data-testid="stPageLink"]) {
+    margin-top: -3.6rem;
+    padding-left: 1.5rem;
+}
+
+/* Les conteneurs intermédiaires ne doivent pas être positionnés,
+   pour que la zone cliquable (::after) couvre toute la carte */
+.st-key-module_assistant [data-testid="stElementContainer"],
+.st-key-module_assistant [data-testid="stPageLink"],
+.st-key-module_assistant [data-testid="stPageLink"] > div,
+.st-key-module_assistant [data-testid="stPageLink-NavLink"] {
+    position: static;
+}
+
+.st-key-module_assistant [data-testid="stPageLink-NavLink"] {
+    padding: 0;
+    background: transparent;
+}
+
+.st-key-module_assistant [data-testid="stPageLink-NavLink"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: var(--hn-radius-md);
+}
+
+.st-key-module_assistant [data-testid="stPageLink-NavLink"] p,
+.st-key-module_assistant [data-testid="stPageLink-NavLink"] span {
+    color: var(--hn-green-800);
+    font-weight: 600;
+}
+
+.st-key-module_assistant [data-testid="stPageLink-NavLink"] span[data-testid="stIconMaterial"] {
+    transition: transform var(--hn-base) var(--hn-ease-spring);
+}
+
+.st-key-module_assistant:hover [data-testid="stIconMaterial"] {
+    transform: translateX(4px);
+}
+
+@media (max-width: 640px) {
+    .hn-hero {
+        padding: 3rem 1.2rem 2.8rem;
+    }
+
+    .st-key-navbar {
+        border-radius: var(--hn-radius-md);
+    }
+}

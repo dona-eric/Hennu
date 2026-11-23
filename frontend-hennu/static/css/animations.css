@@ -1,0 +1,80 @@
+/* =================================================================
+   Orion — Bibliothèque d'animations
+   ================================================================= */
+
+/* Apparition douce depuis le bas */
+@keyframes hn-rise {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Fondu simple */
+@keyframes hn-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Bulle qui « éclot » (messages utilisateur) */
+@keyframes hn-pop {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.92);
+    }
+    70% {
+        opacity: 1;
+        transform: translateY(-2px) scale(1.01);
+    }
+    100% {
+        transform: none;
+    }
+}
+
+/* Trait doré qui se dessine */
+@keyframes hn-draw {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+/* Halo lumineux qui dérive lentement dans l'en-tête */
+@keyframes hn-drift {
+    0% { transform: translate(-10%, -10%) rotate(0deg); }
+    50% { transform: translate(8%, 6%) rotate(180deg); }
+    100% { transform: translate(-10%, -10%) rotate(360deg); }
+}
+
+/* Pulsation d'un point actif */
+@keyframes hn-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.55); }
+    70% { box-shadow: 0 0 0 9px rgba(201, 162, 39, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0); }
+}
+
+/* Reflet qui balaie un texte en cours */
+@keyframes hn-shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+/* Validation d'une étape */
+@keyframes hn-check {
+    0% { transform: scale(0.4); }
+    60% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+}
+
+/* Respect des préférences d'accessibilité : pas de mouvement */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+    }
+}

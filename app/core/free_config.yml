@@ -1,0 +1,100 @@
+embedder:
+  name: "sentence-transformers"
+  params:
+    model_name: "BAAI/bge-m3"
+    dimension_embedding: 1024
+    normalize_embedding: true
+    device: "cpu"
+
+vector_store:
+  name: "qdrant"
+  params:
+    collection_name: "douane"
+    embedding_dimension: 1024
+    url_qdrant: "https://39a12a7c-bbbd-4f34-b9b8-1712e83f723a.us-west-1-0.aws.cloud.qdrant.io"
+    api_key: "${QDRANT_API_KEY}"
+
+# Configuration des LLM
+llm:
+  provider_first:
+    name: "gemini"
+    params:
+      model_name: "gemini-3.8-flash"            # rédaction de la réponse
+      fast_model_name: "gemini-3.5-flash-lite"  # reformulation, évaluation, vérification
+      temperature: 0.2
+      top_p: 0.95
+      max_tokens: 2048
+      api_key: "${GEMINI_API_KEY}"
+
+  provider_second:
+    # name = hébergeur de l'API : "gemini", "openai" ou "openrouter"
+    # (Gemma est servi par OpenRouter, avec OPENROUTER_API_KEY)
+    name: "openrouter"
+    params:
+      model_name: "google/gemma-4-26b-a4b-it:free"
+      temperature: 0.3
+      top_p: 0.95
+      max_tokens: 2048
+      api_key: "${OPENROUTER_API_KEY}"
+
+reranker:
+  first_reranker:
+    name: "cross-encoder"
+    params:
+      model_name: "BAAI/bge-reranker-v2-m3"
+      device: "cpu"
+      top_n: 5
+
+  second_reranker:
+    name: "reranker-encoder"
+    params:
+      model_name: "BAAI/bge-reranker-base"
+      device: "cpu"
+      top_n: 5
+
+retriever:
+  name: "vector_retriever"
+  params:
+    search_type: "mmr"
+    score_threshold: 0.5
+    similarity_top_k: 20
+
+models:
+  - id: "gemini-3.8-flash"
+    label: "Gemini 3.8 Flash"
+    provider: "gemini"
+    default: true
+  - id: "gemini-3.5-flash-lite"
+    label: "Gemini 3.5 Flash-Lite"
+    provider: "gemini"
+    default: false
+  - id: "google/gemma-4-26b-a4b-it:free"
+    label: "Gemma4-26B"
+    provider: "openrouter"
+    default: false
+
+# provider_url:
+#   name: "gemini"
+#   params:
+#     url_base_gemini: "https://generativelanguage.googleapis.com/v1beta/openai/"
+
+#   name: "openai"
+#   params:
+#     url_base_openai: "https://api.openai.com/v1"
+#   name: "openrouter-google"
+#   params:
+#     url_base_router: "https://openrouter.ai/api/v1"
+
+rag-agentic-config:
+  name: "rag-agentic"
+  version: "1.0.1"
+  prompt_version: "1.0.1"
+  default_top_k: 5
+  default_rerank_top_k: 5
+  enable_caching: true
+  log_level: "INFO"
+  # Boucle agentic
+  max_search_attempts: 2        # recherches max (1 = pas de nouvel essai)
+  max_generation_attempts: 2    # rédactions max (1 = pas de révision)
+  grading_excerpt_chars: 800    # taille des extraits montrés à l'évaluateur
+  verification_excerpt_chars: 2000  # taille des sources montrées au vérificateur

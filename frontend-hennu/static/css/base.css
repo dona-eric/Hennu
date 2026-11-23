@@ -1,0 +1,146 @@
+/* =================================================================
+   Orion — Base : fond, typographie, boutons génériques
+   ================================================================= */
+
+/* L'interface est conçue pour un fond clair, quel que soit le thème
+   choisi dans Streamlit ou par le système : on fixe les couleurs. */
+.stApp {
+    color-scheme: light;
+    background:
+        radial-gradient(1200px 600px at 100% -10%, rgba(201, 162, 39, 0.08), transparent 60%),
+        radial-gradient(900px 500px at -10% 110%, rgba(11, 79, 60, 0.06), transparent 60%),
+        var(--hn-paper);
+    color: var(--hn-ink);
+    font-family: var(--hn-font-body);
+}
+
+.stApp p,
+.stApp li,
+.stApp label,
+.stApp input,
+.stApp textarea,
+.stApp button {
+    font-family: var(--hn-font-body);
+}
+
+.stApp h1,
+.stApp h2,
+.stApp h3 {
+    font-family: var(--hn-font-title);
+    color: var(--hn-green-900);
+    letter-spacing: -0.01em;
+}
+
+/* Texte Markdown (réponses de l'assistant, etc.) */
+.stApp [data-testid="stMarkdownContainer"] {
+    color: var(--hn-ink);
+}
+
+.stApp [data-testid="stMarkdownContainer"] :is(p, li, strong, em, td, th, h4, h5, h6) {
+    color: inherit;
+}
+
+.stApp [data-testid="stMarkdownContainer"] a {
+    color: var(--hn-green-800);
+    text-decoration-color: var(--hn-gold-500);
+}
+
+.stApp [data-testid="stMarkdownContainer"] code {
+    background: var(--hn-green-50);
+    color: var(--hn-green-900);
+}
+
+/* Icônes Material Symbols utilisées dans les gabarits HTML */
+.hn-icon {
+    font-family: "Material Symbols Rounded";
+    font-size: 1.5rem;
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    white-space: nowrap;
+    font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+    background: var(--hn-gold-100);
+    color: var(--hn-green-900);
+}
+
+/* Barre supérieure Streamlit discrète */
+[data-testid="stHeader"] {
+    background: transparent;
+}
+
+[data-testid="stAppDeployButton"] {
+    display: none;
+}
+
+/* Colonne de contenu centrée, à largeur de lecture confortable */
+[data-testid="stMainBlockContainer"] {
+    max-width: 920px;
+    padding-top: 2.5rem;
+    padding-bottom: 7rem;
+}
+
+/* ---------- Boutons ---------- */
+
+.stButton button,
+[data-testid^="stBaseButton-"] {
+    border-radius: var(--hn-radius-sm);
+    font-weight: 500;
+    transition:
+        transform var(--hn-fast) var(--hn-ease-out),
+        box-shadow var(--hn-fast) var(--hn-ease-out),
+        background-color var(--hn-fast) ease,
+        border-color var(--hn-fast) ease,
+        color var(--hn-fast) ease;
+}
+
+[data-testid="stBaseButton-secondary"] {
+    background: var(--hn-surface);
+    border: 1px solid var(--hn-line);
+    color: var(--hn-ink);
+}
+
+[data-testid="stBaseButton-secondary"]:hover {
+    border-color: var(--hn-green-600);
+    color: var(--hn-green-800);
+    transform: translateY(-1px);
+    box-shadow: var(--hn-shadow-sm);
+}
+
+[data-testid="stBaseButton-primary"] {
+    background: var(--hn-green-800);
+    border: 1px solid var(--hn-green-800);
+    color: #FFFFFF;
+}
+
+[data-testid="stBaseButton-primary"]:hover {
+    background: var(--hn-green-600);
+    border-color: var(--hn-green-600);
+    transform: translateY(-1px);
+    box-shadow: var(--hn-shadow-md);
+}
+
+.stButton button:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.stButton button:focus-visible {
+    box-shadow: var(--hn-ring);
+}
+
+/* Barre de défilement fine */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--hn-line-strong);
+    border: 3px solid transparent;
+    border-radius: var(--hn-radius-pill);
+    background-clip: content-box;
+}

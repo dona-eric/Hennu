@@ -1,0 +1,240 @@
+/* =================================================================
+   Orion — Structure : barre latérale, en-tête de chat, pied de page
+   ================================================================= */
+
+/* ---------- Barre latérale ---------- */
+
+[data-testid="stSidebar"] {
+    background:
+        radial-gradient(400px 300px at 0% 0%, rgba(201, 162, 39, 0.12), transparent 70%),
+        linear-gradient(180deg, var(--hn-green-800) 0%, var(--hn-green-900) 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+    color: rgba(247, 245, 239, 0.65);
+}
+
+[data-testid="stSidebarCollapseButton"] button,
+[data-testid="stSidebar"] [data-testid="stSidebarHeader"] svg {
+    color: rgba(247, 245, 239, 0.7);
+}
+
+/* Marque */
+.hn-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.25rem 0 1.25rem;
+    animation: hn-fade var(--hn-slow) var(--hn-ease-out) both;
+}
+
+.hn-brand__mark {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--hn-gold-300), var(--hn-gold-500));
+    color: var(--hn-green-900);
+    font-size: 1.3rem;
+    box-shadow: 0 6px 18px -6px rgba(201, 162, 39, 0.6);
+}
+
+.hn-brand__name {
+    font-family: var(--hn-font-title);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.1;
+}
+
+.hn-brand__tagline {
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--hn-gold-300);
+}
+
+/* Lien « Retour à l'accueil » */
+.st-key-back_home {
+    margin-bottom: 0.6rem;
+}
+
+.st-key-back_home [data-testid="stPageLink-NavLink"] {
+    padding: 0.3rem 0.5rem;
+    border-radius: var(--hn-radius-sm);
+}
+
+.st-key-back_home [data-testid="stPageLink-NavLink"] p,
+.st-key-back_home [data-testid="stPageLink-NavLink"] span {
+    color: rgba(247, 245, 239, 0.7);
+}
+
+.st-key-back_home [data-testid="stPageLink-NavLink"]:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.st-key-back_home [data-testid="stPageLink-NavLink"]:hover p,
+.st-key-back_home [data-testid="stPageLink-NavLink"]:hover span {
+    color: #FFFFFF;
+}
+
+/* Bouton « Nouvelle conversation » : doré dans la barre latérale */
+.st-key-new_conversation button {
+    background: var(--hn-gold-500);
+    border-color: var(--hn-gold-500);
+    color: var(--hn-green-900);
+    font-weight: 600;
+}
+
+.st-key-new_conversation button:hover {
+    background: var(--hn-gold-300);
+    border-color: var(--hn-gold-300);
+    box-shadow: 0 8px 22px -10px rgba(201, 162, 39, 0.8);
+}
+
+/* Titre de section */
+.hn-section-label {
+    margin: 1.2rem 0 0.2rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--hn-ink-soft);
+}
+
+[data-testid="stSidebar"] .hn-section-label {
+    color: rgba(247, 245, 239, 0.45);
+}
+
+/* Historique des conversations */
+.st-key-history {
+    gap: 0.15rem;
+}
+
+.st-key-history button {
+    justify-content: flex-start;
+    border: 1px solid transparent;
+    border-radius: var(--hn-radius-sm);
+    padding: 0.45rem 0.65rem;
+    color: rgba(247, 245, 239, 0.78);
+    background: transparent;
+    animation: hn-rise var(--hn-base) var(--hn-ease-out) both;
+}
+
+.st-key-history button p {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+    color: inherit;
+}
+
+.st-key-history button:hover {
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.07);
+    transform: translateX(2px);
+    box-shadow: none;
+}
+
+/* Conversation ouverte */
+.st-key-history [data-testid="stBaseButton-secondary"] {
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.11);
+    border-color: rgba(227, 199, 102, 0.35);
+    box-shadow: inset 3px 0 0 var(--hn-gold-500);
+}
+
+/* Bas de la barre latérale */
+.st-key-sidebar_bottom {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.st-key-clear_history button {
+    color: rgba(247, 245, 239, 0.55);
+}
+
+.st-key-clear_history button:hover {
+    color: var(--hn-gold-300);
+}
+
+/* Pastille d'état */
+.hn-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--hn-radius-pill);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.78rem;
+    color: rgba(247, 245, 239, 0.8);
+}
+
+.hn-status__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ADE80;
+    animation: hn-pulse 2.4s ease-out infinite;
+}
+
+/* ---------- En-tête de conversation ---------- */
+
+.hn-chat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0 0 1.1rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--hn-line);
+    animation: hn-fade var(--hn-base) var(--hn-ease-out) both;
+}
+
+.hn-chat-header__mark {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--hn-green-800);
+    color: var(--hn-gold-300);
+    font-size: 1.1rem;
+}
+
+.hn-chat-header__title {
+    font-family: var(--hn-font-title);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--hn-green-900);
+}
+
+.hn-chat-header__subtitle {
+    font-size: 0.78rem;
+    color: var(--hn-ink-soft);
+}
+
+/* ---------- Pied de page ---------- */
+
+.hn-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 3rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--hn-line);
+    font-size: 0.78rem;
+    color: var(--hn-ink-soft);
+}
+
+.hn-footer__brand {
+    font-family: var(--hn-font-title);
+    font-weight: 700;
+    color: var(--hn-green-800);
+}
