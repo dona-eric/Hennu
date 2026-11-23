@@ -20,14 +20,16 @@ llm:
     name: "gemini"
     params:
       model_name: "gemini-3.8-flash"            # rédaction de la réponse
-      fast_model_name: "gemini-3.8-flash-lite"  # reformulation de la question
+      fast_model_name: "gemini-3.5-flash-lite"  # reformulation, évaluation, vérification
       temperature: 0.2
       top_p: 0.95
       max_tokens: 2048
       api_key: "${GEMINI_API_KEY}"
 
   provider_second:
-    name: "google-gemini"
+    # name = hébergeur de l'API : "gemini", "openai" ou "openrouter"
+    # (Gemma est servi par OpenRouter, avec OPENROUTER_API_KEY)
+    name: "openrouter"
     params:
       model_name: "google/gemma-4-26b-a4b-it:free"
       temperature: 0.3
@@ -62,8 +64,8 @@ models:
     label: "Gemini 3.8 Flash"
     provider: "gemini"
     default: true
-  - id: "gemini-3.8-flash-lite"
-    label: "Gemini 3.8 Flash-Lite"
+  - id: "gemini-3.5-flash-lite"
+    label: "Gemini 3.5 Flash-Lite"
     provider: "gemini"
     default: false
   - id: "google/gemma-4-26b-a4b-it:free"
